@@ -1,0 +1,71 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Product;
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class ProductSeeder extends Seeder
+{
+    /**
+     * Seed the products table with realistic scientific supplies.
+     */
+    public function run(): void
+    {
+        // Get all sellers (labs + wholesalers)
+        $sellerRoleIds = Role::whereIn('code', ['lab', 'wholesale'])->pluck('id');
+        $sellers       = User::whereIn('role_id', $sellerRoleIds)->get();
+
+        $products = [
+            // Chemicals & Reagents
+            ['name' => 'Acide Chlorhydrique 37%',        'offer_type' => 'sale', 'unit' => 'L',     'price' => 2500.00,  'safety_level' => 4, 'stock' => 120],
+            ['name' => 'Hydroxyde de Sodium NaOH',       'offer_type' => 'sale', 'unit' => 'kg',    'price' => 1800.00,  'safety_level' => 3, 'stock' => 200],
+            ['name' => 'Éthanol Absolu 99.8%',            'offer_type' => 'sale', 'unit' => 'L',     'price' => 3200.00,  'safety_level' => 3, 'stock' => 80],
+            ['name' => 'Acide Sulfurique Concentré',      'offer_type' => 'sale', 'unit' => 'L',     'price' => 2800.00,  'safety_level' => 5, 'stock' => 50],
+            ['name' => 'Acétone Pure',                     'offer_type' => 'sale', 'unit' => 'L',     'price' => 1500.00,  'safety_level' => 3, 'stock' => 150],
+            ['name' => 'Phénolphtaléine Indicateur',       'offer_type' => 'sale', 'unit' => 'g',     'price' => 4500.00,  'safety_level' => 2, 'stock' => 60],
+            ['name' => 'Bleu de Méthylène',                'offer_type' => 'sale', 'unit' => 'g',     'price' => 3800.00,  'safety_level' => 1, 'stock' => 90],
+            ['name' => 'Nitrate d\'Argent AgNO3',          'offer_type' => 'sale', 'unit' => 'g',     'price' => 12000.00, 'safety_level' => 3, 'stock' => 25],
+
+            // Lab Equipment (for sale)
+            ['name' => 'Bécher en Verre Borosilicate 500ml', 'offer_type' => 'sale', 'unit' => 'piece', 'price' => 850.00,   'safety_level' => 1, 'stock' => 300],
+            ['name' => 'Erlenmeyer 250ml',                    'offer_type' => 'sale', 'unit' => 'piece', 'price' => 650.00,   'safety_level' => 1, 'stock' => 250],
+            ['name' => 'Pipette Graduée 10ml',                'offer_type' => 'sale', 'unit' => 'piece', 'price' => 450.00,   'safety_level' => 1, 'stock' => 400],
+            ['name' => 'Burette Automatique 50ml',            'offer_type' => 'sale', 'unit' => 'piece', 'price' => 7500.00,  'safety_level' => 1, 'stock' => 45],
+            ['name' => 'Lames de Microscope (boîte de 50)',   'offer_type' => 'sale', 'unit' => 'box',   'price' => 1200.00,  'safety_level' => 1, 'stock' => 180],
+            ['name' => 'Gants Nitrile (boîte de 100)',        'offer_type' => 'sale', 'unit' => 'box',   'price' => 2200.00,  'safety_level' => 1, 'stock' => 500],
+            ['name' => 'Lunettes de Protection Chimie',       'offer_type' => 'sale', 'unit' => 'piece', 'price' => 1800.00,  'safety_level' => 1, 'stock' => 200],
+
+            // Lab Equipment (for rent)
+            ['name' => 'Microscope Optique Binoculaire',      'offer_type' => 'rent', 'unit' => 'piece', 'price' => 5000.00,  'safety_level' => 1, 'stock' => 15],
+            ['name' => 'Balance Analytique Précision 0.1mg',  'offer_type' => 'rent', 'unit' => 'piece', 'price' => 3500.00,  'safety_level' => 1, 'stock' => 10],
+            ['name' => 'Spectrophotomètre UV-Visible',        'offer_type' => 'rent', 'unit' => 'piece', 'price' => 12000.00, 'safety_level' => 1, 'stock' => 5],
+            ['name' => 'Centrifugeuse de Laboratoire',         'offer_type' => 'rent', 'unit' => 'piece', 'price' => 8000.00,  'safety_level' => 2, 'stock' => 8],
+            ['name' => 'pH-mètre Digital',                     'offer_type' => 'rent', 'unit' => 'piece', 'price' => 2000.00,  'safety_level' => 1, 'stock' => 20],
+
+            // Biologicals
+            ['name' => 'Gélose Nutritive (500g)',              'offer_type' => 'sale', 'unit' => 'g',     'price' => 6500.00,  'safety_level' => 1, 'stock' => 70],
+            ['name' => 'Bouillon Mueller-Hinton',              'offer_type' => 'sale', 'unit' => 'L',     'price' => 4200.00,  'safety_level' => 1, 'stock' => 40],
+            ['name' => 'Kit de Coloration de Gram',            'offer_type' => 'sale', 'unit' => 'kit',   'price' => 5500.00,  'safety_level' => 2, 'stock' => 55],
+            ['name' => 'Boîtes de Pétri Stériles (paquet 20)', 'offer_type' => 'sale', 'unit' => 'pack',  'price' => 1800.00,  'safety_level' => 1, 'stock' => 350],
+            ['name' => 'Anse de Platine',                      'offer_type' => 'sale', 'unit' => 'piece', 'price' => 3000.00,  'safety_level' => 1, 'stock' => 100],
+        ];
+
+        foreach ($products as $productData) {
+            Product::create([
+                'seller_id'      => $sellers->random()->id,
+                'name'           => $productData['name'],
+                // slug is auto-generated by Product::boot()
+                'offer_type'     => $productData['offer_type'],
+                'unit'           => $productData['unit'],
+                'price'          => $productData['price'],
+                'safety_level'   => $productData['safety_level'],
+                'msds_path'      => $productData['safety_level'] >= 3 ? 'msds/' . \Illuminate\Support\Str::slug($productData['name']) . '.pdf' : null,
+                'documentations' => rand(0, 1) ? 'docs/' . \Illuminate\Support\Str::slug($productData['name']) . '.pdf' : null,
+                'stock'          => $productData['stock'],
+            ]);
+        }
+    }
+}

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Order;
+use App\Models\OrderStatus;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;
@@ -20,8 +21,7 @@ class OrderSeeder extends Seeder
         $students      = User::where('role_id', $studentRoleId)->get();
         $products      = Product::all();
         $wilayas       = Wilaya::all();
-
-        $statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+        $statuses      = OrderStatus::all();
 
         $addresses = [
             'Cité Universitaire, Bâtiment C, Chambre 204',
@@ -47,7 +47,7 @@ class OrderSeeder extends Seeder
                 'total_price'      => 0, // will be updated below
                 'shipping_address' => $addresses[array_rand($addresses)] . ', ' . $wilaya->name,
                 'wilaya_id'        => $wilaya->id,
-                'status'           => $statuses[array_rand($statuses)],
+                'order_status_id'  => $statuses->random()->id,
             ]);
 
             // Attach products to the order

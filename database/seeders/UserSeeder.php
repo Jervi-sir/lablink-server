@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\BusinessProfile;
+use App\Models\BusinessCategory;
+use App\Models\LaboratoryCategory;
 use App\Models\Department;
-use App\Models\LabType;
 use App\Models\Role;
 use App\Models\StudentProfile;
 use App\Models\User;
@@ -23,7 +24,8 @@ class UserSeeder extends Seeder
     {
         $roles    = Role::all()->keyBy('code');
         $wilayas  = Wilaya::all();
-        $labTypes = LabType::all();
+        $businessCategories = BusinessCategory::all()->keyBy('code');
+        $laboratoryCategories = LaboratoryCategory::all();
         $departments = Department::all();
 
         // ─── Admin ──────────────────────────────────────────
@@ -62,7 +64,8 @@ class UserSeeder extends Seeder
                 'bio'             => $lab['bio'],
                 'certificate_url' => 'certificates/lab_' . ($i + 1) . '.pdf',
                 'address'         => 'Zone Industrielle, Lot ' . rand(1, 50) . ', ' . $wilayas->random()->name,
-                'lab_type_id'     => $labTypes->random()->id,
+                'business_category_id'   => $businessCategories['lab']->id,
+                'laboratory_category_id' => $laboratoryCategories->random()->id,
                 'wilaya_id'       => $wilayas->random()->id,
             ]);
         }
@@ -91,7 +94,8 @@ class UserSeeder extends Seeder
                 'bio'             => $ws['bio'],
                 'certificate_url' => 'certificates/wholesale_' . ($i + 1) . '.pdf',
                 'address'         => 'Boulevard du Commerce, N° ' . rand(1, 200) . ', ' . $wilayas->random()->name,
-                'lab_type_id'     => $labTypes->random()->id,
+                'business_category_id'   => $businessCategories['wholesale']->id,
+                'laboratory_category_id' => $laboratoryCategories->random()->id,
                 'wilaya_id'       => $wilayas->random()->id,
             ]);
         }

@@ -4,28 +4,53 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BusinessProfile extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $guarded = [];
+  protected $table = 'businesses';
 
-    // ─── Relationships ──────────────────────────────────────
+  protected $fillable = [
+    'user_id',
+    'name',
+    'nif',
+    'logo',
+    'bio',
+    'certificate_url',
+    'phone_numbers',
+    'address',
+    'business_category_id',
+    'laboratory_category_id',
+    'wilaya_id',
+  ];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+  protected $casts = [
+    'phone_numbers' => 'array',
+  ];
 
-    public function labType(): BelongsTo
-    {
-        return $this->belongsTo(LabType::class);
-    }
+  public function user()
+  {
+    return $this->belongsTo(User::class);
+  }
 
-    public function wilaya(): BelongsTo
-    {
-        return $this->belongsTo(Wilaya::class);
-    }
+  public function businessCategory()
+  {
+    return $this->belongsTo(BusinessCategory::class);
+  }
+
+  public function laboratoryCategory()
+  {
+    return $this->belongsTo(LaboratoryCategory::class);
+  }
+
+  public function wilaya()
+  {
+    return $this->belongsTo(Wilaya::class);
+  }
+
+  public function products()
+  {
+    return $this->hasMany(Product::class, 'seller_id', 'user_id');
+  }
 }

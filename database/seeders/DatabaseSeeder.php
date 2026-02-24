@@ -17,7 +17,10 @@ class DatabaseSeeder extends Seeder
             // 1. Core Lookups
             WilayaSeeder::class,
             RoleSeeder::class,
-            LabTypeSeeder::class,
+            BusinessCategorySeeder::class,
+            LaboratoryCategorySeeder::class,
+            ProductCategorySeeder::class,
+            OrderStatusSeeder::class,
             UniversitySeeder::class,
             DepartmentSeeder::class,
 
@@ -27,6 +30,9 @@ class DatabaseSeeder extends Seeder
             // 3. Marketplace
             ProductSeeder::class,
             OrderSeeder::class,
+
+            // 4. Communication
+            ConversationSeeder::class,
         ]);
     }
 }

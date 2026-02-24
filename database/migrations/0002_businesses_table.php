@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('business_profiles', function (Blueprint $table) {
+        Schema::create('businesses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('nif')->nullable(); // Numéro d'Identification Fiscale
+            $table->string('logo')->nullable();
             $table->text('bio')->nullable();
             $table->string('certificate_url')->nullable();
+            $table->json('phone_numbers')->nullable();
             $table->text('address')->nullable();
-            $table->foreignId('lab_type_id')->constrained();
+            $table->foreignId('business_category_id')->constrained();
+            $table->foreignId('laboratory_category_id')->nullable()->constrained();
             $table->foreignId('wilaya_id')->constrained();
             $table->timestamps();
         });
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('business_profiles');
+        Schema::dropIfExists('businesses');
     }
 };

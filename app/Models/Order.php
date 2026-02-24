@@ -4,76 +4,52 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class Order extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'code',
+        'total_price',
+        'shipping_address',
+        'wilaya_id',
+        'order_status_id',
+    ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
+     * The "booted" method of the model.
      */
-    protected function casts(): array
+    protected static function booted()
     {
-        return [
-            'total_price' => 'decimal:2',
-        ];
-    }
-
-    // ─── Boot ───────────────────────────────────────────────
-
-    protected static function boot(): void
-    {
-        parent::boot();
-
-        // Auto-generate a unique, random characteristic ID upon creation
-        // Format: ORD-XXXX-YYYY  (e.g., ORD-A7K3-2026)
-        static::creating(function (Order $order) {
-            if (empty($order->code)) {
-                $order->code = static::generateOrderCode();
+        static::creating(function ($order) {
+            if (!$order->code) {
+                $order->code = 'ORD-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4));
             }
         });
     }
 
-    /**
-     * Generate a unique order code.
-     *
-     * Format: ORD-{4 random alphanumeric chars}-{current year}
-     * Example: ORD-A7K3-2026
-     */
-    public static function generateOrderCode(): string
-    {
-        do {
-            $randomPart = strtoupper(Str::random(4));
-            $year       = date('Y');
-            $code       = "ORD-{$randomPart}-{$year}";
-        } while (static::where('code', $code)->exists());
-
-        return $code;
-    }
-
-    // ─── Relationships ──────────────────────────────────────
-
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function wilaya(): BelongsTo
+    public function status()
+    {
+        return $this->belongsTo(OrderStatus::class, 'order_status_id');
+    }
+
+    public function wilaya()
     {
         return $this->belongsTo(Wilaya::class);
     }
 
-    public function products(): BelongsToMany
+    public function products()
     {
         return $this->belongsToMany(Product::class, 'order_products')
-                     ->withPivot(['quantity', 'price'])
-                     ->withTimestamps();
+            ->withPivot(['quantity', 'price'])
+            ->withTimestamps();
     }
 }

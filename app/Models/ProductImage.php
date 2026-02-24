@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Wilaya extends Model
+class ProductImage extends Model
 {
     //
 }

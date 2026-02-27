@@ -43,12 +43,6 @@ return new class extends Migration
             $table->string('comment');
             $table->timestamps();
         });
-        Schema::create('product_user_favorites', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('product_id')->constrained();
-            $table->timestamps();
-        });
     }
 
     /**

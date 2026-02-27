@@ -17,11 +17,21 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
-        $studentRoleId = Role::where('code', 'student')->first()->id;
-        $students      = User::where('role_id', $studentRoleId)->get();
-        $products      = Product::all();
-        $wilayas       = Wilaya::all();
-        $statuses      = OrderStatus::all();
+        $studentRole = Role::where('code', 'student')->first();
+        if (!$studentRole) {
+            $this->command->error("Student role not found. Please run RoleSeeder first.");
+            return;
+        }
+
+        $students = User::where('role_id', $studentRole->id)->get();
+        $products = Product::all();
+        $wilayas = Wilaya::all();
+        $statuses = OrderStatus::all();
+
+        if ($students->isEmpty() || $products->isEmpty() || $wilayas->isEmpty() || $statuses->isEmpty()) {
+            $this->command->error("Missing required data (students, products, wilayas, or statuses). Please run other seeders first.");
+            return;
+        }
 
         $addresses = [
             'Cité Universitaire, Bâtiment C, Chambre 204',

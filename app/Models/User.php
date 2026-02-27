@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -72,6 +73,11 @@ class User extends Authenticatable
         return $this->hasOne(StudentProfile::class);
     }
 
+    public function notificationSetting(): HasOne
+    {
+        return $this->hasOne(NotificationSetting::class);
+    }
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class, 'seller_id');
@@ -97,6 +103,21 @@ class User extends Authenticatable
         return $this->hasMany(Conversation::class, 'user2_id');
     }
 
+    public function savedProducts()
+    {
+        return $this->belongsToMany(Product::class, 'saved_products');
+    }
+
+    public function savedBusinesses()
+    {
+        return $this->belongsToMany(BusinessProfile::class, 'saved_businesses', 'user_id', 'business_id');
+    }
+
+    public function followedBusinesses()
+    {
+        return $this->belongsToMany(BusinessProfile::class, 'followers', 'user_id', 'business_id');
+    }
+
     // ─── Helpers ────────────────────────────────────────────
 
     /**
@@ -116,19 +137,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Determine if the user is a laboratory.
+     * Determine if the user is a business.
      */
-    public function isLab(): bool
+    public function isBusiness(): bool
     {
-        return $this->hasRole('lab');
-    }
-
-    /**
-     * Determine if the user is a wholesaler.
-     */
-    public function isWholesaler(): bool
-    {
-        return $this->hasRole('wholesale');
+        return $this->hasRole('business');
     }
 
     /**
@@ -137,5 +150,37 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');
+    }
+
+    // ─── Formatter ──────────────────────────────────────────
+
+    /**
+     * Format the user data for API responses.
+     */
+    public function format(): array
+    {
+        $data = [
+            'id' => $this->id,
+            'email' => $this->email,
+            'phoneNumber' => $this->phone_number,
+            'avatar' => $this->avatar,
+            'role' => $this->role ? [
+                'id' => $this->role->id,
+                'code' => $this->role->code,
+            ] : null,
+            'isVerified' => (bool) $this->is_verified,
+            'createdAt' => $this->created_at?->toIso8601String(),
+            'updatedAt' => $this->updated_at?->toIso8601String(),
+        ];
+
+        if ($this->studentProfile) {
+            $data['studentProfile'] = $this->studentProfile->format();
+        }
+
+        if ($this->businessProfile) {
+            $data['businessProfile'] = $this->businessProfile->format();
+        }
+
+        return $data;
     }
 }

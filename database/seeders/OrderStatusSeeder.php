@@ -13,11 +13,11 @@ class OrderStatusSeeder extends Seeder
   public function run(): void
   {
     $statuses = [
-      ['code' => 'pending',   'is_final' => false],
-      ['code' => 'confirmed', 'is_final' => false],
-      ['code' => 'shipped',   'is_final' => false],
-      ['code' => 'delivered', 'is_final' => true],
-      ['code' => 'cancelled', 'is_final' => true],
+      ['code' => 'pending',    'is_final' => false],
+      ['code' => 'processing', 'is_final' => false],
+      ['code' => 'ready',      'is_final' => false],
+      ['code' => 'done',       'is_final' => true],
+      ['code' => 'cancelled',  'is_final' => true],
     ];
 
     foreach ($statuses as $status) {

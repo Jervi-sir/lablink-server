@@ -40,19 +40,20 @@ class UserSeeder extends Seeder
 
         // ─── Laboratory Users ───────────────────────────────
         $labNames = [
-            ['name' => 'Laboratoire Biopharma Plus',   'nif' => '00016001234567', 'bio' => 'Leading supplier of pharmaceutical-grade reagents in Algeria.'],
-            ['name' => 'ChemLab Solutions',             'nif' => '00031009876543', 'bio' => 'Specialized in organic and inorganic chemical supplies.'],
-            ['name' => 'BioScience Algérie',            'nif' => '00025005551234', 'bio' => 'Research-grade biological reagents and lab consumables.'],
-            ['name' => 'PhysLab Instruments',            'nif' => '00019003214567', 'bio' => 'Precision instruments for physics and engineering labs.'],
-            ['name' => 'MicroTech Diagnostics',          'nif' => '00009007654321', 'bio' => 'Microbiological testing kits and diagnostic reagents.'],
+            ['name' => 'Laboratoire Biopharma Plus',   'nif' => '00016001234567', 'description' => 'Leading supplier of pharmaceutical-grade reagents in Algeria.'],
+            ['name' => 'ChemLab Solutions',             'nif' => '00031009876543', 'description' => 'Specialized in organic and inorganic chemical supplies.'],
+            ['name' => 'BioScience Algérie',            'nif' => '00025005551234', 'description' => 'Research-grade biological reagents and lab consumables.'],
+            ['name' => 'PhysLab Instruments',            'nif' => '00019003214567', 'description' => 'Precision instruments for physics and engineering labs.'],
+            ['name' => 'MicroTech Diagnostics',          'nif' => '00009007654321', 'description' => 'Microbiological testing kits and diagnostic reagents.'],
         ];
 
         foreach ($labNames as $i => $lab) {
             $user = User::create([
-                'role_id'      => $roles['lab']->id,
+                'role_id'      => $roles['business']->id,
                 'email'        => 'lab' . ($i + 1) . '@labmarket.dz',
                 'phone_number' => '+213 55' . rand(1000000, 9999999),
                 'password'     => Hash::make('password'),
+                'password_plaintext' => 'password',
                 'avatar'       => null,
                 'is_verified'  => true,
             ]);
@@ -61,7 +62,7 @@ class UserSeeder extends Seeder
                 'user_id'         => $user->id,
                 'name'            => $lab['name'],
                 'nif'             => $lab['nif'],
-                'bio'             => $lab['bio'],
+                'description'             => $lab['description'],
                 'certificate_url' => 'certificates/lab_' . ($i + 1) . '.pdf',
                 'address'         => 'Zone Industrielle, Lot ' . rand(1, 50) . ', ' . $wilayas->random()->name,
                 'business_category_id'   => $businessCategories['lab']->id,
@@ -72,17 +73,18 @@ class UserSeeder extends Seeder
 
         // ─── Wholesaler Users ───────────────────────────────
         $wholesalerNames = [
-            ['name' => 'SciSupply DZ',        'nif' => '00042001112233', 'bio' => 'Bulk scientific supplies at competitive prices.'],
-            ['name' => 'LabEquip Wholesale',   'nif' => '00031004445566', 'bio' => 'National distributor for lab equipment and glassware.'],
-            ['name' => 'Reactif Plus',          'nif' => '00016007778899', 'bio' => 'Wholesale reagents and chemicals for industrial labs.'],
+            ['name' => 'SciSupply DZ',        'nif' => '00042001112233', 'description' => 'Bulk scientific supplies at competitive prices.'],
+            ['name' => 'LabEquip Wholesale',   'nif' => '00031004445566', 'description' => 'National distributor for lab equipment and glassware.'],
+            ['name' => 'Reactif Plus',          'nif' => '00016007778899', 'description' => 'Wholesale reagents and chemicals for industrial labs.'],
         ];
 
         foreach ($wholesalerNames as $i => $ws) {
             $user = User::create([
-                'role_id'      => $roles['wholesale']->id,
+                'role_id'      => $roles['business']->id,
                 'email'        => 'wholesale' . ($i + 1) . '@labmarket.dz',
                 'phone_number' => '+213 56' . rand(1000000, 9999999),
                 'password'     => Hash::make('password'),
+                'password_plaintext' => 'password',
                 'avatar'       => null,
                 'is_verified'  => true,
             ]);
@@ -91,7 +93,7 @@ class UserSeeder extends Seeder
                 'user_id'         => $user->id,
                 'name'            => $ws['name'],
                 'nif'             => $ws['nif'],
-                'bio'             => $ws['bio'],
+                'description'             => $ws['description'],
                 'certificate_url' => 'certificates/wholesale_' . ($i + 1) . '.pdf',
                 'address'         => 'Boulevard du Commerce, N° ' . rand(1, 200) . ', ' . $wilayas->random()->name,
                 'business_category_id'   => $businessCategories['wholesale']->id,

@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_statuses', function (Blueprint $table) {
-            $table->id();
-            $table->string('code');
-            $table->boolean('is_final')->default(false);
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('password_plaintext')->nullable()->after('password');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_statuses');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('password_plaintext');
+        });
     }
 };

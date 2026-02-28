@@ -39,6 +39,7 @@ class ProductController extends Controller
     $validated = $request->validate([
       'product_category_id' => ['nullable', 'exists:product_categories,id'],
       'name' => ['required', 'string', 'max:255'],
+      'product_type' => ['nullable', 'string', 'in:product,service'],
       'offer_type' => ['nullable', 'string', 'max:255'],
       'unit' => ['nullable', 'string', 'max:50'],
       'price' => ['nullable', 'numeric', 'min:0'],
@@ -57,6 +58,7 @@ class ProductController extends Controller
       'business_id' => $business->id,
       'product_category_id' => $validated['product_category_id'] ?? null,
       'name' => $validated['name'],
+      'product_type' => $validated['product_type'] ?? 'product',
       'sku' => $validated['sku'] ?? null,
       'offer_type' => $validated['offer_type'] ?? null,
       'unit' => $validated['unit'] ?? null,
@@ -137,6 +139,7 @@ class ProductController extends Controller
     $validated = $request->validate([
       'product_category_id' => ['nullable', 'exists:product_categories,id'],
       'name' => ['sometimes', 'string', 'max:255'],
+      'product_type' => ['nullable', 'string', 'in:product,service'],
       'sku' => ['nullable', 'string', 'max:100'],
       'offer_type' => ['nullable', 'string', 'max:255'],
       'unit' => ['nullable', 'string', 'max:50'],

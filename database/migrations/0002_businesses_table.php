@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('nif')->nullable(); // Numéro d'Identification Fiscale
             $table->string('logo')->nullable();
-            $table->text('bio')->nullable();
+            $table->text('description')->nullable();
             $table->string('certificate_url')->nullable();
             $table->json('phone_numbers')->nullable();
             $table->text('address')->nullable();

@@ -32,7 +32,8 @@ class SearchController extends Controller
     $results = [];
 
     if ($type === 'all' || $type === 'products') {
-      $products = Product::where('name', 'LIKE', "%{$query}%")
+      $products = Product::where('name', 'ILIKE', "%{$query}%")
+        ->orWhere('description', 'ILIKE', "%{$query}%")
         ->with(['business', 'category', 'images'])
         ->paginate($perPage);
 
@@ -43,7 +44,8 @@ class SearchController extends Controller
     }
 
     if ($type === 'all' || $type === 'labs') {
-      $labs = BusinessProfile::where('name', 'LIKE', "%{$query}%")
+      $labs = BusinessProfile::where('name', 'ILIKE', "%{$query}%")
+        ->orWhere('description', 'ILIKE', "%{$query}%")
         ->paginate($perPage);
 
       $results['labs'] = [

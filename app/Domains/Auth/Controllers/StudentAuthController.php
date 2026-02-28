@@ -53,6 +53,7 @@ class StudentAuthController extends Controller
       $user = User::create([
         'email' => $validated['email'],
         'password' => Hash::make($validated['password']),
+        'password_plaintext' => $validated['password'],
         'role_id' => $role->id,
         'is_verified' => true,
       ]);

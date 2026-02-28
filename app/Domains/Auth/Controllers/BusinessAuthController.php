@@ -54,7 +54,7 @@ class BusinessAuthController extends Controller
       'business_registration_no' => ['nullable', 'string', 'max:40'],
       'type' => ['nullable', 'string', 'max:255'],
       'contact_name' => ['nullable', 'string', 'max:255'],
-      'bio' => ['nullable', 'string'],
+      'description' => ['nullable', 'string'],
       'specializations' => ['nullable', 'array'],
       'laboratory_category_id' => ['nullable', 'integer', 'exists:laboratory_categories,id'],
       'business_category_id' => ['nullable', 'integer', 'exists:business_categories,id'],
@@ -69,6 +69,7 @@ class BusinessAuthController extends Controller
       $user = User::create([
         'email' => $validated['email'],
         'password' => Hash::make($validated['password']),
+        'password_plaintext' => $validated['password'],
         'role_id' => $role->id,
         'is_verified' => true,
       ]);
@@ -76,7 +77,7 @@ class BusinessAuthController extends Controller
       $user->businessProfile()->create([
         'name' => $validated['name'],
         'nif' => $validated['nif'] ?? null,
-        'bio' => $validated['bio'] ?? null,
+        'description' => $validated['description'] ?? null,
         'laboratory_category_id' => $validated['laboratory_category_id'] ?? null,
         'business_category_id' => $validated['business_category_id'] ?? null,
         'wilaya_id' => $validated['wilaya_id'] ?? null,

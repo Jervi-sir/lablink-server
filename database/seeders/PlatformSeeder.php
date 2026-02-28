@@ -23,7 +23,10 @@ class PlatformSeeder extends Seeder
     ];
 
     foreach ($platforms as $platform) {
-      Platform::create($platform);
+      Platform::firstOrCreate(
+        ['code' => $platform['code']],
+        $platform
+      );
     }
   }
 }

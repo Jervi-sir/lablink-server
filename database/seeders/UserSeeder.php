@@ -29,14 +29,16 @@ class UserSeeder extends Seeder
         $departments = Department::all();
 
         // ─── Admin ──────────────────────────────────────────
-        User::create([
-            'role_id'      => $roles['admin']->id,
-            'email'        => 'admin@labmarket.dz',
-            'phone_number' => '+213 550 000 000',
-            'password'     => Hash::make('password'),
-            'avatar'       => null,
-            'is_verified'  => true,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@labmarket.dz'],
+            [
+                'role_id'      => $roles['admin']->id,
+                'phone_number' => '+213 550 000 000',
+                'password'     => Hash::make('password'),
+                'avatar'       => null,
+                'is_verified'  => true,
+            ]
+        );
 
         // ─── Laboratory Users ───────────────────────────────
         $labNames = [
@@ -48,28 +50,32 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($labNames as $i => $lab) {
-            $user = User::create([
-                'role_id'      => $roles['business']->id,
-                'email'        => 'lab' . ($i + 1) . '@labmarket.dz',
-                'phone_number' => '+213 55' . rand(1000000, 9999999),
-                'password'     => Hash::make('password'),
-                'password_plaintext' => 'password',
-                'avatar'       => null,
-                'is_verified'  => true,
-            ]);
+            $user = User::updateOrCreate(
+                ['email' => 'lab' . ($i + 1) . '@labmarket.dz'],
+                [
+                    'role_id'      => $roles['business']->id,
+                    'phone_number' => '+213 55' . rand(1000000, 9999999),
+                    'password'     => Hash::make('password'),
+                    'password_plaintext' => 'password',
+                    'avatar'       => null,
+                    'is_verified'  => true,
+                ]
+            );
 
-            BusinessProfile::create([
-                'user_id'         => $user->id,
-                'name'            => $lab['name'],
-                'nif'             => $lab['nif'],
-                'logo'            => 'https://images.unsplash.com/photo-1514416432279-d0faae13f4dd?q=80&w=200&h=200&auto=format&fit=crop', // Lab logo placeholder
-                'description'             => $lab['description'],
-                'certificate_url' => 'certificates/lab_' . ($i + 1) . '.pdf',
-                'address'         => 'Zone Industrielle, Lot ' . rand(1, 50) . ', ' . $wilayas->random()->name,
-                'business_category_id'   => $businessCategories['lab']->id,
-                'laboratory_category_id' => $laboratoryCategories->random()->id,
-                'wilaya_id'       => $wilayas->random()->id,
-            ]);
+            BusinessProfile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'name'            => $lab['name'],
+                    'nif'             => $lab['nif'],
+                    'logo'            => 'https://images.unsplash.com/photo-1514416432279-d0faae13f4dd?q=80&w=200&h=200&auto=format&fit=crop', // Lab logo placeholder
+                    'description'             => $lab['description'],
+                    'certificate_url' => 'certificates/lab_' . ($i + 1) . '.pdf',
+                    'address'         => 'Zone Industrielle, Lot ' . rand(1, 50) . ', ' . $wilayas->random()->name,
+                    'business_category_id'   => $businessCategories['lab']->id,
+                    'laboratory_category_id' => $laboratoryCategories->random()->id,
+                    'wilaya_id'       => $wilayas->random()->id,
+                ]
+            );
         }
 
         // ─── Wholesaler Users ───────────────────────────────
@@ -80,28 +86,32 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($wholesalerNames as $i => $ws) {
-            $user = User::create([
-                'role_id'      => $roles['business']->id,
-                'email'        => 'wholesale' . ($i + 1) . '@labmarket.dz',
-                'phone_number' => '+213 56' . rand(1000000, 9999999),
-                'password'     => Hash::make('password'),
-                'password_plaintext' => 'password',
-                'avatar'       => null,
-                'is_verified'  => true,
-            ]);
+            $user = User::updateOrCreate(
+                ['email' => 'wholesale' . ($i + 1) . '@labmarket.dz'],
+                [
+                    'role_id'      => $roles['business']->id,
+                    'phone_number' => '+213 56' . rand(1000000, 9999999),
+                    'password'     => Hash::make('password'),
+                    'password_plaintext' => 'password',
+                    'avatar'       => null,
+                    'is_verified'  => true,
+                ]
+            );
 
-            BusinessProfile::create([
-                'user_id'         => $user->id,
-                'name'            => $ws['name'],
-                'nif'             => $ws['nif'],
-                'logo'            => 'https://images.unsplash.com/photo-1532187875605-1ef6ec2360ee?q=80&w=200&h=200&auto=format&fit=crop', // Wholesale logo placeholder
-                'description'             => $ws['description'],
-                'certificate_url' => 'certificates/wholesale_' . ($i + 1) . '.pdf',
-                'address'         => 'Boulevard du Commerce, N° ' . rand(1, 200) . ', ' . $wilayas->random()->name,
-                'business_category_id'   => $businessCategories['wholesale']->id,
-                'laboratory_category_id' => $laboratoryCategories->random()->id,
-                'wilaya_id'       => $wilayas->random()->id,
-            ]);
+            BusinessProfile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'name'            => $ws['name'],
+                    'nif'             => $ws['nif'],
+                    'logo'            => 'https://images.unsplash.com/photo-1532187875605-1ef6ec2360ee?q=80&w=200&h=200&auto=format&fit=crop', // Wholesale logo placeholder
+                    'description'             => $ws['description'],
+                    'certificate_url' => 'certificates/wholesale_' . ($i + 1) . '.pdf',
+                    'address'         => 'Boulevard du Commerce, N° ' . rand(1, 200) . ', ' . $wilayas->random()->name,
+                    'business_category_id'   => $businessCategories['wholesale']->id,
+                    'laboratory_category_id' => $laboratoryCategories->random()->id,
+                    'wilaya_id'       => $wilayas->random()->id,
+                ]
+            );
         }
 
         // ─── Student Users ──────────────────────────────────
@@ -110,21 +120,25 @@ class UserSeeder extends Seeder
 
         foreach ($studentFirstNames as $i => $firstName) {
             $lastName = $studentLastNames[$i];
-            $user = User::create([
-                'role_id'      => $roles['student']->id,
-                'email'        => strtolower($firstName) . '.' . strtolower($lastName) . '@etu.dz',
-                'phone_number' => '+213 7' . rand(10000000, 99999999),
-                'password'     => Hash::make('password'),
-                'avatar'       => null,
-                'is_verified'  => $i < 7, // first 7 are verified
-            ]);
+            $user = User::updateOrCreate(
+                ['email' => strtolower($firstName) . '.' . strtolower($lastName) . '@etu.dz'],
+                [
+                    'role_id'      => $roles['student']->id,
+                    'phone_number' => '+213 7' . rand(10000000, 99999999),
+                    'password'     => Hash::make('password'),
+                    'avatar'       => null,
+                    'is_verified'  => $i < 7, // first 7 are verified
+                ]
+            );
 
-            StudentProfile::create([
-                'user_id'         => $user->id,
-                'fullname'        => $firstName . ' ' . $lastName,
-                'student_card_id' => 'STU-' . date('Y') . '-' . str_pad($i + 1, 5, '0', STR_PAD_LEFT),
-                'department_id'   => $departments->random()->id,
-            ]);
+            StudentProfile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'fullname'        => $firstName . ' ' . $lastName,
+                    'student_card_id' => 'STU-' . date('Y') . '-' . str_pad($i + 1, 5, '0', STR_PAD_LEFT),
+                    'department_id'   => $departments->random()->id,
+                ]
+            );
         }
     }
 }

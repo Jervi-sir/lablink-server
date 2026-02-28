@@ -87,7 +87,7 @@ class WilayaSeeder extends Seeder
 
         foreach ($wilayas as $wilaya) {
             Wilaya::create([
-                'code' => $wilaya['name'],
+                'code' => $wilaya['code'],
                 'number' => (int)$wilaya['code'],
                 'en' => $wilaya['name'],
                 'ar' => null, // Placeholder or translation needed

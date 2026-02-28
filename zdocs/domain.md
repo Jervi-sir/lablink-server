@@ -1,6 +1,6 @@
 ## the domain names
 
-* [6030] lablink.jervi.dev
+* [6035] lablink.jervi.dev
 
 lablink.jervi.dev
 
@@ -12,7 +12,7 @@ lablink.jervi.dev
 
 ### Dzpreneurs
 ---------------------------------------------------
-- sudo nano /etc/nginx/sites-available/lablink.jervi.dev
+sudo nano /etc/nginx/sites-available/lablink.jervi.dev
 ```nginx
 server {
     listen 80;
@@ -60,7 +60,7 @@ server {
     }
 
     location / {
-        proxy_pass http://localhost:6030;
+        proxy_pass http://localhost:6035;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -79,8 +79,8 @@ server {
     }
 }
 ```
-- sudo ln -s /etc/nginx/sites-available/lablink.jervi.dev /etc/nginx/sites-enabled/
-- sudo nginx -t
-- sudo systemctl restart nginx
-- sudo certbot --nginx -d lablink.jervi.dev
-- sudo nano /etc/nginx/sites-available/lablink.jervi.dev
+sudo ln -s /etc/nginx/sites-available/lablink.jervi.dev /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+sudo certbot --nginx -d lablink.jervi.dev
+sudo nano /etc/nginx/sites-available/lablink.jervi.dev

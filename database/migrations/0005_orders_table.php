@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('order_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('code');
+            $table->string('en')->nullable();
+            $table->string('ar')->nullable();
+            $table->string('fr')->nullable();
             $table->boolean('is_final')->default(false);
             $table->timestamps();
         });
@@ -23,8 +26,17 @@ return new class extends Migration
             $table->string('code')->unique(); // Auto-generated characteristic ID (ORD-XXXX-YYYY)
             $table->decimal('total_price', 15, 2);
             $table->text('shipping_address');
-            $table->foreignId('wilaya_id')->constrained();
+            $table->foreignId('wilaya_id')->nullable()->constrained();
             $table->foreignId('order_status_id')->constrained(); // pending, confirmed, shipped, delivered, cancelled
+
+            $table->string('department')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('payment_method')->default('bank_transfer');
+            $table->boolean('is_hazmat')->default(false);
+            $table->text('notes')->nullable();
+            $table->decimal('shipping_fee', 12, 2)->default(0);
+            $table->decimal('tax', 12, 2)->default(0);
+
             $table->timestamps();
         });
         Schema::create('order_products', function (Blueprint $table) {
@@ -42,6 +54,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('order_products');
         Schema::dropIfExists('orders');
+        Schema::dropIfExists('order_statuses');
     }
 };

@@ -12,6 +12,7 @@ class WilayaSeeder extends Seeder
      */
     public function run(): void
     {
+        Wilaya::truncate();
         $wilayas = [
             ['code' => '01', 'name' => 'Adrar'],
             ['code' => '02', 'name' => 'Chlef'],
@@ -71,10 +72,27 @@ class WilayaSeeder extends Seeder
             ['code' => '56', 'name' => 'Djanet'],
             ['code' => '57', 'name' => 'In Salah'],
             ['code' => '58', 'name' => 'In Guezzam'],
+            ['code' => '59', 'name' => 'Aflou'],
+            ['code' => '60', 'name' => 'Ain Oussera'],
+            ['code' => '61', 'name' => 'Barika'],
+            ['code' => '62', 'name' => 'Bir El Ater'],
+            ['code' => '63', 'name' => 'Bou Saâda'],
+            ['code' => '64', 'name' => 'El Abiodh Sidi Cheikh'],
+            ['code' => '65', 'name' => 'El Aricha'],
+            ['code' => '66', 'name' => 'El Kantara'],
+            ['code' => '67', 'name' => 'Ksar Chellala'],
+            ['code' => '68', 'name' => 'Ksar El Boukhari'],
+            ['code' => '69', 'name' => 'Messaad'],
         ];
 
         foreach ($wilayas as $wilaya) {
-            Wilaya::create($wilaya);
+            Wilaya::create([
+                'code' => $wilaya['name'],
+                'number' => (int)$wilaya['code'],
+                'en' => $wilaya['name'],
+                'ar' => null, // Placeholder or translation needed
+                'fr' => null, // Placeholder or translation needed
+            ]);
         }
     }
 }

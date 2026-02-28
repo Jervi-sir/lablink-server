@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderStatus extends Model
 {
-  protected $fillable = ['code', 'is_final'];
+  protected $fillable = ['code', 'en', 'ar', 'fr', 'is_final'];
 
   public function orders()
   {

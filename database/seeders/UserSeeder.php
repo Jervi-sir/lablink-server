@@ -62,6 +62,7 @@ class UserSeeder extends Seeder
                 'user_id'         => $user->id,
                 'name'            => $lab['name'],
                 'nif'             => $lab['nif'],
+                'logo'            => 'https://images.unsplash.com/photo-1514416432279-d0faae13f4dd?q=80&w=200&h=200&auto=format&fit=crop', // Lab logo placeholder
                 'description'             => $lab['description'],
                 'certificate_url' => 'certificates/lab_' . ($i + 1) . '.pdf',
                 'address'         => 'Zone Industrielle, Lot ' . rand(1, 50) . ', ' . $wilayas->random()->name,
@@ -93,6 +94,7 @@ class UserSeeder extends Seeder
                 'user_id'         => $user->id,
                 'name'            => $ws['name'],
                 'nif'             => $ws['nif'],
+                'logo'            => 'https://images.unsplash.com/photo-1532187875605-1ef6ec2360ee?q=80&w=200&h=200&auto=format&fit=crop', // Wholesale logo placeholder
                 'description'             => $ws['description'],
                 'certificate_url' => 'certificates/wholesale_' . ($i + 1) . '.pdf',
                 'address'         => 'Boulevard du Commerce, N° ' . rand(1, 200) . ', ' . $wilayas->random()->name,

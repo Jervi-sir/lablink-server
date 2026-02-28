@@ -68,6 +68,7 @@ class UniversitySeeder extends Seeder
                 University::create([
                     'name'      => $uni['name'],
                     'wilaya_id' => $wilaya->id,
+                    'address'   => 'Campus Universitaire, ' . ($wilaya->en ?? 'Algeria'),
                 ]);
             }
         }

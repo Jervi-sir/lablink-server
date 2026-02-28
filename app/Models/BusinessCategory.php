@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BusinessCategory extends Model
 {
-  protected $fillable = ['code'];
+  protected $fillable = ['code', 'en', 'ar', 'fr'];
 
   public function businessProfiles()
   {

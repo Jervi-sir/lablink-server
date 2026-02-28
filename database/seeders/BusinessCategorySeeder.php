@@ -13,12 +13,15 @@ class BusinessCategorySeeder extends Seeder
   public function run(): void
   {
     $categories = [
-      'lab',
-      'wholesale',
+      ['code' => 'lab',       'en' => 'Laboratory', 'ar' => 'مختبر',     'fr' => 'Laboratoire'],
+      ['code' => 'wholesale', 'en' => 'Wholesaler', 'ar' => 'تاجر جملة', 'fr' => 'Grossiste'],
     ];
 
     foreach ($categories as $category) {
-      BusinessCategory::firstOrCreate(['code' => $category]);
+      BusinessCategory::firstOrCreate(
+        ['code' => $category['code']],
+        ['en' => $category['en'], 'ar' => $category['ar'], 'fr' => $category['fr']]
+      );
     }
   }
 }

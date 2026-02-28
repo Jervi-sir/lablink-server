@@ -13,17 +13,20 @@ class ProductCategorySeeder extends Seeder
   public function run(): void
   {
     $categories = [
-      'chemicals',
-      'reagents',
-      'equipment',
-      'glassware',
-      'biologicals',
-      'consumables',
-      'instruments',
+      ['code' => 'chemicals',  'en' => 'Chemicals',  'ar' => 'مواد كيميائية', 'fr' => 'Produits chimiques'],
+      ['code' => 'reagents',   'en' => 'Reagents',   'ar' => 'كواشف',       'fr' => 'Réactifs'],
+      ['code' => 'equipment',  'en' => 'Equipment',  'ar' => 'معدات',       'fr' => 'Équipement'],
+      ['code' => 'glassware',  'en' => 'Glassware',  'ar' => 'أواني زجاجية', 'fr' => 'Verrerie'],
+      ['code' => 'biologicals', 'en' => 'Biologicals', 'ar' => 'مواد بيولوجية', 'fr' => 'Produits biologiques'],
+      ['code' => 'consumables', 'en' => 'Consumables', 'ar' => 'مستهلكات',    'fr' => 'Consommables'],
+      ['code' => 'instruments', 'en' => 'Instruments', 'ar' => 'أدوات',       'fr' => 'Instruments'],
     ];
 
     foreach ($categories as $category) {
-      ProductCategory::firstOrCreate(['code' => $category]);
+      ProductCategory::firstOrCreate(
+        ['code' => $category['code']],
+        ['en' => $category['en'], 'ar' => $category['ar'], 'fr' => $category['fr']]
+      );
     }
   }
 }

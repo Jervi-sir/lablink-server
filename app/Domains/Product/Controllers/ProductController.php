@@ -193,8 +193,15 @@ class ProductController extends Controller
   {
     $perPage = $request->input('per_page', 10);
     $categoryId = $request->input('product_category_id');
+    $random = $request->boolean('random');
 
-    $query = Product::where('is_trending', true);
+    $query = Product::where('is_available', true);
+
+    if ($random) {
+      $query->inRandomOrder();
+    } else {
+      $query->where('is_trending', true);
+    }
 
     if ($categoryId) {
       $query->where('product_category_id', $categoryId);

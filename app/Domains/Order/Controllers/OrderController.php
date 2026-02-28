@@ -19,7 +19,7 @@ class OrderController extends Controller
    */
   public function index(Request $request): JsonResponse
   {
-    $query = Order::with(['status', 'wilaya', 'products.business']);
+    $query = Order::with(['status', 'wilaya', 'products.business', 'products.images']);
 
     if (!$request->user()->isAdmin()) {
       $query->where('user_id', $request->user()->id);
@@ -115,7 +115,7 @@ class OrderController extends Controller
 
     return response()->json([
       'message' => 'Order placed successfully',
-      'data' => $order->load(['products.business', 'status', 'wilaya'])
+      'data' => $order->load(['products.business', 'products.images', 'status', 'wilaya'])
     ], 201);
   }
 
@@ -146,7 +146,7 @@ class OrderController extends Controller
       return response()->json(['message' => 'Unauthorized'], 403);
     }
 
-    $order->load(['status', 'wilaya', 'products.business', 'user.studentProfile']);
+    $order->load(['status', 'wilaya', 'products.business', 'products.images', 'user.studentProfile']);
 
     return response()->json([
       'data' => $order
@@ -187,7 +187,7 @@ class OrderController extends Controller
 
     return response()->json([
       'message' => 'Order status updated successfully',
-      'data' => $order->load(['status', 'wilaya', 'products.business', 'user.studentProfile'])
+      'data' => $order->load(['status', 'wilaya', 'products.business', 'products.images', 'user.studentProfile'])
     ]);
   }
 
@@ -213,7 +213,7 @@ class OrderController extends Controller
     $query = Order::whereHas('products', function ($q) use ($business) {
       $q->where('business_id', $business->id);
     })->with(['status', 'user.studentProfile', 'products' => function ($q) use ($business) {
-      $q->where('business_id', $business->id);
+      $q->where('business_id', $business->id)->with('images');
     }]);
 
     if ($status && $status !== 'All') {

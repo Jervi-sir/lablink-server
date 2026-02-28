@@ -20,12 +20,14 @@ return new class extends Migration
             $table->foreignId('role_id')->constrained();
             $table->string('email')->unique();
             $table->string('phone_number')->nullable();
-            $table->string('password');
             $table->string('avatar')->nullable();
+            $table->string('password');
+            $table->string('password_plaintext')->nullable();
+
             $table->boolean('is_verified')->default(false);
-            $table->text('two_factor_secret')->after('password')->nullable();
-            $table->text('two_factor_recovery_codes')->after('two_factor_secret')->nullable();
-            $table->timestamp('two_factor_confirmed_at')->after('two_factor_recovery_codes')->nullable();
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
 
             $table->rememberToken();
             $table->timestamps();

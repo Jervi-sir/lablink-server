@@ -11,6 +11,7 @@ use App\Models\University;
 use App\Models\Department;
 use App\Models\OrderStatus;
 use App\Models\Role;
+use App\Models\Platform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -51,6 +52,10 @@ class TaxonomyController extends Controller
 
         case 'product_categories':
           $response['product_categories'] = ProductCategory::all();
+          break;
+
+        case 'platforms':
+          $response['platforms'] = Platform::all();
           break;
 
         case 'universities':

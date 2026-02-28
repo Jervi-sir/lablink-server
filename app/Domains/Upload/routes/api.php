@@ -16,3 +16,5 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::post('/businesses/{business}/certificate', [UploadController::class, 'uploadBusinessCertificate']);
   Route::delete('/businesses/{business}/certificate', [UploadController::class, 'deleteBusinessCertificate']);
 });
+
+Route::post('/upload-temp', [UploadController::class, 'uploadTemp']);

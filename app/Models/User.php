@@ -29,6 +29,9 @@ class User extends Authenticatable
         'password_plaintext',
         'avatar',
         'is_verified',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
     ];
 
     /**

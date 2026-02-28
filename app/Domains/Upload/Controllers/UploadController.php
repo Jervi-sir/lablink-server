@@ -210,11 +210,32 @@ class UploadController extends Controller
         Storage::disk('public')->delete($storagePath);
       }
     }
-
     $business->update(['certificate_url' => null]);
 
     return response()->json([
       'message' => 'Certificate deleted successfully',
+    ]);
+  }
+
+  /**
+   * Upload a temporary file (generic).
+   *
+   * @param Request $request
+   * @return JsonResponse
+   */
+  public function uploadTemp(Request $request): JsonResponse
+  {
+    $request->validate([
+      'file' => ['required', 'file', 'max:10240'], // 10MB max
+    ]);
+
+    $path = $request->file('file')->store("temp", 'public');
+    $url = url('/storage/' . $path);
+
+    return response()->json([
+      'message' => 'File uploaded successfully',
+      'url' => $url,
+      'path' => $path,
     ]);
   }
 }

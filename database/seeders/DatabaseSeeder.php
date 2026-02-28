@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             OrderStatusSeeder::class,
             UniversitySeeder::class,
             DepartmentSeeder::class,
+            PlatformSeeder::class,
 
             // 2. Users & Profiles
             UserSeeder::class,

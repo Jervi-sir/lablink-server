@@ -15,16 +15,26 @@ return new class extends Migration
             $table->id();
             $table->foreignId('business_id')->constrained();
             $table->foreignId('product_category_id')->constrained();
-            $table->string('slug')->unique();
             $table->string('name');
-            $table->enum('offer_type', ['sale', 'rent']);
-            $table->string('unit'); // mg, ml, L, piece, etc.
+            $table->string('slug')->unique();
+            $table->string('product_type')->default('product'); // 'product' or 'service'
+            $table->string('unit')->nullable();
+            $table->string('offer_type')->nullable();
             $table->decimal('price', 12, 2);
-            $table->integer('safety_level')->default(1);
+            $table->integer('safety_level')->nullable();
             $table->string('msds_path')->nullable(); // Material Safety Data Sheet
             $table->string('documentations')->nullable(); // Manuals / Spec sheets
             $table->integer('stock')->default(0);
             $table->boolean('is_available')->default(true);
+
+            $table->boolean('is_trending')->default(false);
+
+            $table->string('sku')->nullable();
+            $table->text('description')->nullable();
+            $table->text('summary')->nullable();
+            $table->json('specifications')->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
         });
         Schema::create('product_images', function (Blueprint $table) {

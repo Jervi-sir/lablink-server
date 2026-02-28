@@ -60,6 +60,8 @@ class BusinessAuthController extends Controller
       'business_category_id' => ['nullable', 'integer', 'exists:business_categories,id'],
       'wilaya_id' => ['nullable', 'integer', 'exists:wilayas,id'],
       'address' => ['nullable', 'string', 'max:500'],
+      'logo' => ['nullable', 'string'],
+      'certificate' => ['nullable', 'string'],
       // Add more fields if needed
     ]);
 
@@ -77,11 +79,15 @@ class BusinessAuthController extends Controller
       $user->businessProfile()->create([
         'name' => $validated['name'],
         'nif' => $validated['nif'] ?? null,
+        'registration_no' => $validated['business_registration_no'] ?? null,
         'description' => $validated['description'] ?? null,
         'laboratory_category_id' => $validated['laboratory_category_id'] ?? null,
         'business_category_id' => $validated['business_category_id'] ?? null,
         'wilaya_id' => $validated['wilaya_id'] ?? null,
         'address' => $validated['address'] ?? null,
+        'logo' => $validated['logo'] ?? null,
+        'certificate_url' => $validated['certificate'] ?? null,
+        'specializations' => $validated['specializations'] ?? [],
         // We'll map 'type' and 'contact_name' to appropriate fields or metadata if available
         // For now, let's keep it simple
       ]);

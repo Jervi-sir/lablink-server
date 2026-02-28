@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('fullname');
-            $table->string('student_card_id')->unique();
-            $table->foreignId('department_id')->constrained();
+            $table->string('student_card_id')->nullable();
+            $table->foreignId('department_id')->nullable()->constrained();
+
             $table->timestamps();
         });
     }

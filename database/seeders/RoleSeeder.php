@@ -12,10 +12,17 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = ['student', 'business', 'admin'];
+        $roles = [
+            ['code' => 'student',  'en' => 'Student',  'ar' => 'طالب', 'fr' => 'Étudiant'],
+            ['code' => 'business', 'en' => 'Business', 'ar' => 'عمل',   'fr' => 'Entreprise'],
+            ['code' => 'admin',    'en' => 'Admin',    'ar' => 'مدير', 'fr' => 'Admin'],
+        ];
 
         foreach ($roles as $role) {
-            Role::create(['code' => $role]);
+            Role::firstOrCreate(
+                ['code' => $role['code']],
+                ['en' => $role['en'], 'ar' => $role['ar'], 'fr' => $role['fr']]
+            );
         }
     }
 }

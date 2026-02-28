@@ -19,7 +19,7 @@ class BusinessController extends Controller
   public function index(): JsonResponse
   {
     return response()->json([
-      'data' => BusinessProfile::with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya'])->get()
+      'data' => BusinessProfile::with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'contacts.platform'])->get()
     ]);
   }
 
@@ -37,11 +37,14 @@ class BusinessController extends Controller
       'logo' => ['nullable', 'string'],
       'description' => ['nullable', 'string'],
       'certificate_url' => ['nullable', 'string'],
-      'phone_numbers' => ['nullable', 'array'],
       'address' => ['nullable', 'string'],
       'business_category_id' => ['nullable', 'exists:business_categories,id'],
       'laboratory_category_id' => ['nullable', 'exists:laboratory_categories,id'],
       'wilaya_id' => ['nullable', 'exists:wilayas,id'],
+      'contacts' => ['nullable', 'array'],
+      'contacts.*.platform_id' => ['required', 'exists:platforms,id'],
+      'contacts.*.content' => ['required', 'string'],
+      'contacts.*.label' => ['nullable', 'string'],
     ]);
 
     $validated['user_id'] = $request->user()->id;
@@ -53,16 +56,21 @@ class BusinessController extends Controller
       'logo' => $validated['logo'] ?? null,
       'description' => $validated['description'] ?? null,
       'certificate_url' => $validated['certificate_url'] ?? null,
-      'phone_numbers' => $validated['phone_numbers'] ?? [],
       'address' => $validated['address'] ?? null,
       'business_category_id' => $validated['business_category_id'] ?? null,
       'laboratory_category_id' => $validated['laboratory_category_id'] ?? null,
       'wilaya_id' => $validated['wilaya_id'] ?? null,
     ]);
 
+    if (!empty($validated['contacts'])) {
+      foreach ($validated['contacts'] as $contact) {
+        $business->contacts()->create($contact);
+      }
+    }
+
     return response()->json([
       'message' => 'Business profile created successfully',
-      'data' => $business
+      'data' => $business->load('contacts.platform')
     ], 201);
   }
 
@@ -75,7 +83,7 @@ class BusinessController extends Controller
    */
   public function show(Request $request, BusinessProfile $business): JsonResponse
   {
-    $business->load(['user', 'businessCategory', 'laboratoryCategory', 'wilaya']);
+    $business->load(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'contacts.platform']);
 
     $user = $request->user('sanctum');
 
@@ -176,7 +184,7 @@ class BusinessController extends Controller
   public function me(Request $request): JsonResponse
   {
     $business = BusinessProfile::where('user_id', $request->user()->id)
-      ->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'products'])
+      ->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'products', 'contacts.platform'])
       ->firstOrFail();
 
     return response()->json([
@@ -203,24 +211,29 @@ class BusinessController extends Controller
       'logo' => ['nullable', 'string'],
       'description' => ['nullable', 'string'],
       'certificate_url' => ['nullable', 'string'],
-      'phone_numbers' => ['nullable', 'array'],
       'address' => ['nullable', 'string'],
       'business_category_id' => ['nullable', 'exists:business_categories,id'],
       'laboratory_category_id' => ['nullable', 'exists:laboratory_categories,id'],
       'wilaya_id' => ['nullable', 'exists:wilayas,id'],
       'operating_hours' => ['nullable', 'array'],
-      'website' => ['nullable', 'string', 'max:255'],
-      'business_email' => ['nullable', 'string', 'email', 'max:255'],
-      'support_email' => ['nullable', 'string', 'email', 'max:255'],
-      'whatsapp' => ['nullable', 'string', 'max:50'],
-      'linkedin' => ['nullable', 'string', 'max:255'],
+      'contacts' => ['nullable', 'array'],
+      'contacts.*.platform_id' => ['required', 'exists:platforms,id'],
+      'contacts.*.content' => ['required', 'string'],
+      'contacts.*.label' => ['nullable', 'string'],
     ]);
 
     $business->update($validated);
 
+    if (isset($validated['contacts'])) {
+      $business->contacts()->delete();
+      foreach ($validated['contacts'] as $contact) {
+        $business->contacts()->create($contact);
+      }
+    }
+
     return response()->json([
       'message' => 'Business profile updated successfully',
-      'data' => $business
+      'data' => $business->load('contacts.platform')
     ]);
   }
 
@@ -233,12 +246,19 @@ class BusinessController extends Controller
   public function featuredLabs(Request $request): JsonResponse
   {
     $perPage = $request->input('per_page', 10);
+    $random = $request->boolean('random');
 
-    $labs = BusinessProfile::where('is_featured', true)
-      ->whereHas('businessCategory', function ($query) {
-        $query->where('code', 'lab');
-      })
-      ->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya'])
+    $query = BusinessProfile::whereHas('businessCategory', function ($query) {
+      $query->where('code', 'lab');
+    });
+
+    if ($random) {
+      $query->inRandomOrder();
+    } else {
+      $query->where('is_featured', true);
+    }
+
+    $labs = $query->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'contacts.platform'])
       ->paginate($perPage);
 
     $user = $request->user('sanctum');
@@ -262,7 +282,7 @@ class BusinessController extends Controller
       ->whereHas('businessCategory', function ($query) {
         $query->where('code', 'lab');
       })
-      ->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya'])
+      ->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'contacts.platform'])
       ->latest()
       ->paginate($perPage);
 

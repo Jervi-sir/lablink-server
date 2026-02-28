@@ -18,23 +18,19 @@ class BusinessProfile extends Model
     'logo',
     'description',
     'certificate_url',
-    'phone_numbers',
     'address',
     'business_category_id',
     'laboratory_category_id',
     'wilaya_id',
     'is_featured',
     'operating_hours',
-    'website',
-    'business_email',
-    'support_email',
-    'whatsapp',
-    'linkedin',
+    'specializations',
+    'registration_no',
   ];
 
   protected $casts = [
-    'phone_numbers' => 'array',
     'operating_hours' => 'array',
+    'specializations' => 'array',
   ];
 
   public function user()
@@ -55,6 +51,11 @@ class BusinessProfile extends Model
   public function wilaya()
   {
     return $this->belongsTo(Wilaya::class);
+  }
+
+  public function contacts()
+  {
+    return $this->hasMany(BusinessContact::class, 'business_id');
   }
 
   public function products()
@@ -79,16 +80,23 @@ class BusinessProfile extends Model
       'userId' => $this->user_id,
       'name' => $this->name,
       'nif' => $this->nif,
+      'registrationNo' => $this->registration_no,
       'logo' => $this->logo,
       'description' => $this->description,
       'certificateUrl' => $this->certificate_url,
-      'phoneNumbers' => $this->phone_numbers,
       'address' => $this->address,
-      'website' => $this->website,
-      'businessEmail' => $this->business_email,
-      'supportEmail' => $this->support_email,
-      'whatsapp' => $this->whatsapp,
-      'linkedin' => $this->linkedin,
+      'contacts' => $this->contacts->map(function ($contact) {
+        return [
+          'id' => $contact->id,
+          'platform' => [
+            'id' => $contact->platform->id,
+            'code' => $contact->platform->code,
+            'icon' => $contact->platform->icon,
+          ],
+          'content' => $contact->content,
+          'label' => $contact->label,
+        ];
+      }),
       'category' => $this->businessCategory ? [
         'id' => $this->businessCategory->id,
         'code' => $this->businessCategory->code,
@@ -103,6 +111,7 @@ class BusinessProfile extends Model
       ] : null,
       'isFeatured' => (bool)$this->is_featured,
       'operatingHours' => $this->operating_hours,
+      'specializations' => $this->specializations ?? [],
       'productCount' => $this->products()->count(),
       'followerCount' => $this->followers()->count(),
       'isFollowed' => $user ? $this->followers()->where('user_id', $user->id)->exists() : false,

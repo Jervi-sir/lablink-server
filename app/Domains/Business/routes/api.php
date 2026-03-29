@@ -13,6 +13,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('businesses', [BusinessController::class, 'index']);
 Route::get('businesses/featured-labs', [BusinessController::class, 'featuredLabs']);
+Route::get('businesses/featured-suppliers', [BusinessController::class, 'featuredSuppliers']);
 Route::get('businesses/top-labs', [BusinessController::class, 'topLabs']);
 Route::get('businesses/{business}', [BusinessController::class, 'show']);
 Route::get('businesses/{business}/products', [BusinessController::class, 'products']);

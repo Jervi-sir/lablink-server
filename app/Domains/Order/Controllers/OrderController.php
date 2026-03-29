@@ -263,4 +263,26 @@ class OrderController extends Controller
       'counts' => $counts
     ]);
   }
+
+  /**
+   * Display a listing of orders placed by the laboratory (as a buyer).
+   *
+   * @param Request $request
+   * @return JsonResponse
+   */
+  public function laboratoryOrders(Request $request): JsonResponse
+  {
+    $user = $request->user();
+    $perPage = $request->input('per_page', 10);
+
+    $query = Order::where('user_id', $user->id)
+      ->with(['status', 'wilaya', 'products.business', 'products.images']);
+
+    $orders = $query->latest()->paginate($perPage);
+
+    return response()->json([
+      'data' => $orders->items(),
+      'next_page' => $orders->hasMorePages() ? $orders->currentPage() + 1 : null,
+    ]);
+  }
 }

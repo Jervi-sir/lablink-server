@@ -9,4 +9,5 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::get('/orders/{order}', [OrderController::class, 'show']);
   Route::patch('/orders/{order}/status', [OrderController::class, 'update']);
   Route::get('/business/orders', [OrderController::class, 'businessOrders']);
+  Route::get('/laboratory/orders', [OrderController::class, 'laboratoryOrders']);
 });

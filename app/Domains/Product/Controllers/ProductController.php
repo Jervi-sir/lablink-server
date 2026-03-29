@@ -3,6 +3,7 @@
 namespace App\Domains\Product\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\BusinessCategory;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -195,7 +196,10 @@ class ProductController extends Controller
     $categoryId = $request->input('product_category_id');
     $random = $request->boolean('random');
 
-    $query = Product::where('is_available', true);
+    $query = Product::where('is_available', true)
+      ->whereHas('business.businessCategory', function ($query) {
+        $query->where('code', BusinessCategory::CODE_WHOLESALE);
+      });
 
     if ($random) {
       $query->inRandomOrder();
@@ -280,6 +284,7 @@ class ProductController extends Controller
     return response()->json([
       'data' => $products->getCollection()->map(fn($product) => $product->format($user)),
       'next_page' => $products->hasMorePages() ? $products->currentPage() + 1 : null,
+      'total' => $products->total(),
     ]);
   }
 }

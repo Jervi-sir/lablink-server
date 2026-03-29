@@ -123,6 +123,11 @@ class User extends Authenticatable
         return $this->belongsToMany(BusinessProfile::class, 'followers', 'user_id', 'business_id');
     }
 
+    public function estimationRequests(): HasMany
+    {
+        return $this->hasMany(EstimationRequest::class);
+    }
+
     // ─── Helpers ────────────────────────────────────────────
 
     /**

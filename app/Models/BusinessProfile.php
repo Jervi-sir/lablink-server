@@ -73,6 +73,11 @@ class BusinessProfile extends Model
     return $this->belongsToMany(User::class, 'saved_businesses', 'business_id', 'user_id');
   }
 
+  public function estimationRequests()
+  {
+    return $this->hasMany(EstimationRequest::class, 'business_id');
+  }
+
   public function format($user = null)
   {
     return [

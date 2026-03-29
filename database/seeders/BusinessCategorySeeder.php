@@ -13,8 +13,8 @@ class BusinessCategorySeeder extends Seeder
   public function run(): void
   {
     $categories = [
-      ['code' => 'lab',       'en' => 'Laboratory', 'ar' => 'مختبر',     'fr' => 'Laboratoire'],
-      ['code' => 'wholesale', 'en' => 'Wholesaler', 'ar' => 'تاجر جملة', 'fr' => 'Grossiste'],
+      ['code' => 'laboratory',       'en' => 'Laboratory', 'ar' => 'مختبر',     'fr' => 'Laboratoire'],
+      ['code' => 'supplier', 'en' => 'Wholesaler', 'ar' => 'تاجر جملة', 'fr' => 'Grossiste'],
     ];
 
     foreach ($categories as $category) {

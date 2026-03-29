@@ -57,7 +57,7 @@ class BusinessAuthController extends Controller
       'description' => ['nullable', 'string'],
       'specializations' => ['nullable', 'array'],
       'laboratory_category_id' => ['nullable', 'integer', 'exists:laboratory_categories,id'],
-      'business_category_id' => ['nullable', 'integer', 'exists:business_categories,id'],
+      'business_category' => ['nullable', 'string', 'max:255'],
       'wilaya_id' => ['nullable', 'integer', 'exists:wilayas,id'],
       'address' => ['nullable', 'string', 'max:500'],
       'logo' => ['nullable', 'string'],
@@ -76,13 +76,21 @@ class BusinessAuthController extends Controller
         'is_verified' => true,
       ]);
 
+      $businessCategoryId = null;
+      if (!empty($validated['business_category'])) {
+        $businessCategoryId = DB::table('business_categories')
+          ->where('code', $validated['business_category'])
+          ->orWhere('en', $validated['business_category'])
+          ->value('id');
+      }
+
       $user->businessProfile()->create([
         'name' => $validated['name'],
         'nif' => $validated['nif'] ?? null,
         'registration_no' => $validated['business_registration_no'] ?? null,
         'description' => $validated['description'] ?? null,
         'laboratory_category_id' => $validated['laboratory_category_id'] ?? null,
-        'business_category_id' => $validated['business_category_id'] ?? null,
+        'business_category_id' => $businessCategoryId,
         'wilaya_id' => $validated['wilaya_id'] ?? null,
         'address' => $validated['address'] ?? null,
         'logo' => $validated['logo'] ?? null,

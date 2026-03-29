@@ -27,9 +27,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         Telescope::night();
-        if (env('DB_HOST') === '127.0.0.1' || env('DB_HOST') === 'localhost') {
-            URL::forceScheme('https');
-        }
+        // if (env('DB_HOST') === '127.0.0.1' || env('DB_HOST') === 'localhost') {
+        //     URL::forceScheme('https');
+        // }
     }
 
     /**
@@ -45,13 +45,13 @@ class AppServiceProvider extends ServiceProvider
 
         Password::defaults(
             fn(): ?Password => app()->isProduction()
-                ? Password::min(12)
+            ? Password::min(12)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
                 ->symbols()
                 ->uncompromised()
-                : null
+            : null
         );
     }
 }

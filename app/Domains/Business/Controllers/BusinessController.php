@@ -3,6 +3,7 @@
 namespace App\Domains\Business\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\BusinessCategory;
 use App\Models\BusinessProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -245,28 +246,12 @@ class BusinessController extends Controller
    */
   public function featuredLabs(Request $request): JsonResponse
   {
-    $perPage = $request->input('per_page', 10);
-    $random = $request->boolean('random');
+    return $this->featuredBusinessesByCategory($request, BusinessCategory::CODE_LAB);
+  }
 
-    $query = BusinessProfile::whereHas('businessCategory', function ($query) {
-      $query->where('code', 'lab');
-    });
-
-    if ($random) {
-      $query->inRandomOrder();
-    } else {
-      $query->where('is_featured', true);
-    }
-
-    $labs = $query->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'contacts.platform'])
-      ->paginate($perPage);
-
-    $user = $request->user('sanctum');
-
-    return response()->json([
-      'data' => $labs->getCollection()->map(fn($lab) => $lab->format($user)),
-      'next_page' => $labs->hasMorePages() ? $labs->currentPage() + 1 : null,
-    ]);
+  public function featuredSuppliers(Request $request): JsonResponse
+  {
+    return $this->featuredBusinessesByCategory($request, BusinessCategory::CODE_WHOLESALE);
   }
   /**
    * Display a listing of top laboratories (not featured).
@@ -280,7 +265,7 @@ class BusinessController extends Controller
 
     $labs = BusinessProfile::where('is_featured', false)
       ->whereHas('businessCategory', function ($query) {
-        $query->where('code', 'lab');
+        $query->where('code', BusinessCategory::CODE_LAB);
       })
       ->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'contacts.platform'])
       ->latest()
@@ -291,6 +276,32 @@ class BusinessController extends Controller
     return response()->json([
       'data' => $labs->getCollection()->map(fn($lab) => $lab->format($user)),
       'next_page' => $labs->hasMorePages() ? $labs->currentPage() + 1 : null,
+    ]);
+  }
+
+  protected function featuredBusinessesByCategory(Request $request, string $categoryCode): JsonResponse
+  {
+    $perPage = $request->input('per_page', 10);
+    $random = $request->boolean('random');
+
+    $query = BusinessProfile::whereHas('businessCategory', function ($query) use ($categoryCode) {
+      $query->where('code', $categoryCode);
+    });
+
+    if ($random) {
+      $query->inRandomOrder();
+    } else {
+      $query->where('is_featured', true);
+    }
+
+    $businesses = $query->with(['user', 'businessCategory', 'laboratoryCategory', 'wilaya', 'contacts.platform'])
+      ->paginate($perPage);
+
+    $user = $request->user('sanctum');
+
+    return response()->json([
+      'data' => $businesses->getCollection()->map(fn($business) => $business->format($user)),
+      'next_page' => $businesses->hasMorePages() ? $businesses->currentPage() + 1 : null,
     ]);
   }
 }

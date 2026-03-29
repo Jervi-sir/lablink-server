@@ -73,6 +73,11 @@ class Product extends Model
         return $this->belongsToMany(User::class, 'saved_products');
     }
 
+    public function estimationRequestItems()
+    {
+        return $this->hasMany(EstimationRequestItem::class);
+    }
+
     public function format($user = null)
     {
 

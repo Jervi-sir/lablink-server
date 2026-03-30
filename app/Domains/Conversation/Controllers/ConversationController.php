@@ -134,18 +134,93 @@ class ConversationController extends Controller
     }
 
     $validated = $request->validate([
-      'content' => ['required', 'string'],
+      'message' => ['nullable', 'string', 'required_without:image'],
+      'image' => ['nullable', 'image', 'max:10240'], // 10MB max
+      'type' => ['nullable', 'string', 'in:text,image'],
     ]);
+
+    $type = $validated['type'] ?? 'text';
+    $object = null;
+
+    if ($request->hasFile('image')) {
+      $path = $request->file('image')->store('messages/' . $conversation->id, 'public');
+      $type = 'image';
+      $object = [
+        'path' => $path,
+        'url' => asset('storage/' . $path),
+        'mime' => $request->file('image')->getMimeType(),
+        'size' => $request->file('image')->getSize(),
+      ];
+    }
 
     $message = Message::create([
       'conversation_id' => $conversation->id,
       'sender_id' => $userId,
-      'content' => $validated['content'],
+      'message' => $validated['message'] ?? '',
+      'type' => $type,
+      'object' => $object,
     ]);
+
+    $message->load('sender');
+
+    // Update conversation timestamp
+    $conversation->touch();
+
+    // Dispatch broadcast event
+    broadcast(new \App\Events\MessageSent($message))->toOthers();
 
     return response()->json([
       'message' => 'Message sent successfully',
       'data' => $message
     ], 201);
+  }
+
+  /**
+   * Delete a conversation.
+   *
+   * @param Request $request
+   * @param Conversation $conversation
+   * @return JsonResponse
+   */
+  public function destroy(Request $request, Conversation $conversation): JsonResponse
+  {
+    $userId = $request->user()->id;
+
+    if ($conversation->user1_id !== $userId && $conversation->user2_id !== $userId) {
+      return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $conversation->delete();
+
+    return response()->json([
+      'message' => 'Conversation deleted successfully'
+    ]);
+  }
+
+  /**
+   * Delete a specific message.
+   *
+   * @param Request $request
+   * @param Conversation $conversation
+   * @param Message $message
+   * @return JsonResponse
+   */
+  public function deleteMessage(Request $request, Conversation $conversation, Message $message): JsonResponse
+  {
+    $userId = $request->user()->id;
+
+    if ($message->sender_id !== $userId) {
+      return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    if ($message->conversation_id !== $conversation->id) {
+      return response()->json(['message' => 'Invalid parameters'], 400);
+    }
+
+    $message->delete();
+
+    return response()->json([
+      'message' => 'Message deleted successfully'
+    ]);
   }
 }

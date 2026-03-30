@@ -4,11 +4,12 @@ namespace App\Domains\Search\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\BusinessCategory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ProductDiscoveryController extends Controller
+class LaboratoryProductSearchController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
@@ -19,21 +20,18 @@ class ProductDiscoveryController extends Controller
         $categoryIds = $request->input('product_category_ids', []);
         $minPrice = $request->input('min_price');
         $maxPrice = $request->input('max_price');
-        $safetyLevels = $request->input('safety_levels', []);
         $sortBy = $request->input('sort_by', 'recent');
-        $businessCategoryCode = $request->input('business_category_code');
 
         if (is_string($categoryIds)) {
             $categoryIds = array_filter(explode(',', $categoryIds));
         }
 
-        if (is_string($safetyLevels)) {
-            $safetyLevels = array_filter(explode(',', $safetyLevels));
-        }
-
         $productsQuery = Product::query()
             ->where('is_available', true)
-            ->with(['business.businessCategory', 'business.wilaya', 'category', 'images', 'reviews']);
+            ->with(['business.businessCategory', 'business.wilaya', 'category', 'images', 'reviews'])
+            ->whereHas('business.businessCategory', function (Builder $q) {
+                $q->where('code', BusinessCategory::CODE_LAB);
+            });
 
         if ($query !== '') {
             $terms = array_filter(explode(' ', $query));
@@ -74,14 +72,12 @@ class ProductDiscoveryController extends Controller
             $productsQuery->where('price', '<=', (float) $maxPrice);
         }
 
+        $safetyLevels = $request->input('safety_levels', []);
+        if (is_string($safetyLevels)) {
+            $safetyLevels = array_filter(explode(',', $safetyLevels));
+        }
         if (!empty($safetyLevels)) {
             $productsQuery->whereIn('safety_level', array_map('intval', $safetyLevels));
-        }
- 
-        if ($businessCategoryCode) {
-            $productsQuery->whereHas('business.businessCategory', function (Builder $q) use ($businessCategoryCode) {
-                $q->where('code', $businessCategoryCode);
-            });
         }
 
         switch ($sortBy) {

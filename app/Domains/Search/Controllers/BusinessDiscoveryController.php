@@ -24,12 +24,17 @@ class BusinessDiscoveryController extends Controller
             ->whereNotNull('name');
 
         if ($query !== '') {
-            $businessesQuery->where(function (Builder $builder) use ($query) {
-                $builder
-                    ->where('name', 'like', "%{$query}%")
-                    ->orWhere('description', 'like', "%{$query}%")
-                    ->orWhere('address', 'like', "%{$query}%")
-                    ->orWhere('specializations', 'like', "%{$query}%");
+            $terms = array_filter(explode(' ', $query));
+            $businessesQuery->where(function (Builder $builder) use ($terms) {
+                foreach ($terms as $term) {
+                    $lowerTerm = strtolower($term);
+                    $builder->where(function (Builder $sub) use ($lowerTerm) {
+                        $sub->whereRaw('LOWER(name) LIKE ?', ["%{$lowerTerm}%"])
+                            ->orWhereRaw('LOWER(description) LIKE ?', ["%{$lowerTerm}%"])
+                            ->orWhereRaw('LOWER(address) LIKE ?', ["%{$lowerTerm}%"])
+                            ->orWhereRaw('LOWER(specializations) LIKE ?', ["%{$lowerTerm}%"]);
+                    });
+                }
             });
         }
 

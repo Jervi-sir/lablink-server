@@ -39,8 +39,14 @@ class LaboratorySearchController extends Controller
       });
     })
       ->where(function ($q) use ($query) {
-        $q->where('name', 'ILIKE', "%{$query}%")
-          ->orWhere('description', 'ILIKE', "%{$query}%");
+        $terms = array_filter(explode(' ', $query));
+        foreach ($terms as $term) {
+          $lowerTerm = strtolower($term);
+          $q->where(function ($sub) use ($lowerTerm) {
+            $sub->whereRaw('LOWER(name) LIKE ?', ["%{$lowerTerm}%"])
+              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$lowerTerm}%"]);
+          });
+        }
       })
       ->with(['business', 'category', 'images'])
       ->paginate($perPage);
@@ -57,8 +63,14 @@ class LaboratorySearchController extends Controller
       $q->where('code', BusinessCategory::CODE_WHOLESALE);
     })
       ->where(function ($q) use ($query) {
-        $q->where('name', 'ILIKE', "%{$query}%")
-          ->orWhere('description', 'ILIKE', "%{$query}%");
+        $terms = array_filter(explode(' ', $query));
+        foreach ($terms as $term) {
+          $lowerTerm = strtolower($term);
+          $q->where(function ($sub) use ($lowerTerm) {
+            $sub->whereRaw('LOWER(name) LIKE ?', ["%{$lowerTerm}%"])
+              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$lowerTerm}%"]);
+          });
+        }
       })
       ->paginate($perPage);
 

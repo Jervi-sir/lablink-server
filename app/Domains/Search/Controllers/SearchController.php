@@ -32,8 +32,16 @@ class SearchController extends Controller
     $results = [];
 
     if ($type === 'all' || $type === 'products') {
-      $products = Product::where('name', 'ILIKE', "%{$query}%")
-        ->orWhere('description', 'ILIKE', "%{$query}%")
+      $products = Product::where(function ($q) use ($query) {
+        $terms = array_filter(explode(' ', $query));
+        foreach ($terms as $term) {
+          $lowerTerm = strtolower($term);
+          $q->where(function ($sub) use ($lowerTerm) {
+            $sub->whereRaw('LOWER(name) LIKE ?', ["%{$lowerTerm}%"])
+              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$lowerTerm}%"]);
+          });
+        }
+      })
         ->with(['business', 'category', 'images'])
         ->paginate($perPage);
 
@@ -44,8 +52,16 @@ class SearchController extends Controller
     }
 
     if ($type === 'all' || $type === 'labs') {
-      $labs = BusinessProfile::where('name', 'ILIKE', "%{$query}%")
-        ->orWhere('description', 'ILIKE', "%{$query}%")
+      $labs = BusinessProfile::where(function ($q) use ($query) {
+        $terms = array_filter(explode(' ', $query));
+        foreach ($terms as $term) {
+          $lowerTerm = strtolower($term);
+          $q->where(function ($sub) use ($lowerTerm) {
+            $sub->whereRaw('LOWER(name) LIKE ?', ["%{$lowerTerm}%"])
+              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$lowerTerm}%"]);
+          });
+        }
+      })
         ->paginate($perPage);
 
       $results['labs'] = [

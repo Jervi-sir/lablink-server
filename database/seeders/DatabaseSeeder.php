@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // 1. Core Lookups
+                // 1. Core Lookups
             WilayaSeeder::class,
             RoleSeeder::class,
             BusinessCategorySeeder::class,
@@ -26,14 +26,14 @@ class DatabaseSeeder extends Seeder
             PlatformSeeder::class,
 
             // 2. Users & Profiles
-            UserSeeder::class,
+            // UserSeeder::class,
 
             // 3. Marketplace
-            ProductSeeder::class,
-            OrderSeeder::class,
+            // ProductSeeder::class,
+            // OrderSeeder::class,
 
             // 4. Communication
-            ConversationSeeder::class,
+            // ConversationSeeder::class,
         ]);
     }
 }

@@ -50,10 +50,12 @@ class ProductController extends Controller
             'product_category_id' => 'nullable|exists:product_categories,id',
             'media_ids' => 'nullable|array',
             'media_ids.*' => 'exists:media,id',
+            'images' => 'nullable|array',
         ]);
 
         $product = Product::create([
-            ...collect($validated)->except('media_ids')->toArray(),
+            ...collect($validated)->except(['media_ids', 'images'])->toArray(),
+            'images' => $request->images,
             'user_id' => Auth::id(),
             'price' => $request->price ?? 0,
         ]);
@@ -69,6 +71,33 @@ class ProductController extends Controller
             'status' => 'success',
             'message' => 'تمت الإضافة بنجاح',
             'data' => $product,
+        ]);
+    }
+
+    /**
+     * Display the specified product.
+     */
+    public function show($id)
+    {
+        $product = Product::with(['media', 'category', 'user.lab'])->findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $product,
+        ]);
+    }
+
+    /**
+     * Remove the specified product from storage.
+     */
+    public function destroy($id)
+    {
+        $product = Product::where('user_id', Auth::id())->findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم حذف المنتج بنجاح',
         ]);
     }
 }

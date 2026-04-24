@@ -37,6 +37,8 @@ return new class extends Migration
             $table->enum('type', ['product', 'service'])->default('product');
             $table->boolean('is_active')->default(true);
             $table->string('image_url')->nullable();
+            $table->json('images')->nullable();
+
             
             $table->timestamps();
         });

@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Lab::class);
     }
+
+    public function pushTokens()
+    {
+        return $this->hasMany(PushToken::class);
+    }
 }

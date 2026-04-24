@@ -74,6 +74,32 @@ class LabOrderController extends Controller
 
             DB::commit();
 
+            // Send notification to Student
+            try {
+                $notificationService = app(\App\Services\NotificationService::class);
+                
+                $statusAr = [
+                    'estimation_provided' => 'تم تقديم عرض سعر',
+                    'confirmed' => 'تم تأكيد طلبك',
+                    'rejected' => 'تم رفض طلبك',
+                    'completed' => 'اكتمل طلبك',
+                ];
+
+                $body = $statusAr[$request->status] ?? "تم تحديث حالة طلبك إلى {$request->status}";
+
+                $studentUser = $order->student;
+                if ($studentUser) {
+                    $notificationService->sendPushNotification(
+                        $studentUser,
+                        "تحديث في حالة الطلب 📦",
+                        $body,
+                        ['order_id' => (string)$order->id, 'type' => 'order_status_change', 'status' => $request->status]
+                    );
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send order status update notification: " . $e->getMessage());
+            }
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'تم تحديث حالة الطلب بنجاح',

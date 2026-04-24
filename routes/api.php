@@ -14,6 +14,8 @@ Route::get('/labs/{id}', [\App\Http\Controllers\Api\LabController::class, 'show'
 Route::get('/labs/{id}/products', [\App\Http\Controllers\Api\LabController::class, 'products']);
 
 Route::get('/products', [\App\Http\Controllers\Api\ProductController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/products/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
+Route::delete('/products/{id}', [\App\Http\Controllers\Api\ProductController::class, 'destroy'])->middleware('auth:sanctum');
 Route::post('/products', [\App\Http\Controllers\Api\ProductController::class, 'store'])->middleware('auth:sanctum');
 
 Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index'])->middleware('auth:sanctum');
@@ -46,3 +48,11 @@ Route::middleware('auth:sanctum')->prefix('lab')->group(function () {
     Route::get('/orders/{id}', [\App\Http\Controllers\LabOrderController::class, 'show']);
     Route::post('/orders/{id}/status', [\App\Http\Controllers\LabOrderController::class, 'updateStatus']);
 });
+
+// Push token routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('auth/student/push-token', [\App\Http\Controllers\Api\PushTokenController::class, 'store']);
+    Route::post('auth/business/push-token', [\App\Http\Controllers\Api\PushTokenController::class, 'store']);
+});
+
+// Manual notification trigger

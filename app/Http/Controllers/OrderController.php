@@ -65,6 +65,23 @@ class OrderController extends Controller
 
             DB::commit();
 
+            // Send notification to Lab
+            try {
+                $notificationService = app(\App\Services\NotificationService::class);
+                $labUser = $order->lab;
+                if ($labUser) {
+                    $studentName = Auth::user()->student->full_name ?? 'طالب جديد';
+                    $notificationService->sendPushNotification(
+                        $labUser,
+                        "طلب جديد! 🔬",
+                        "لقد تلقيت طلباً جديداً من {$studentName}.",
+                        ['order_id' => (string)$order->id, 'type' => 'new_order']
+                    );
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send order creation notification: " . $e->getMessage());
+            }
+
             return response()->json([
                 'status' => 'success',
                 'data' => $order->load('items.product'),

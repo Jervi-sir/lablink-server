@@ -41,6 +41,19 @@ class Product extends Model
         'price' => 'decimal:2',
     ];
 
+    public function getImageUrlAttribute($value)
+    {
+        if ($value) {
+            return $value;
+        }
+
+        if ($this->images && count($this->images) > 0) {
+            return $this->images[0];
+        }
+
+        return null;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

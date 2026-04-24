@@ -15,8 +15,10 @@ class LabController extends Controller
     public function index(Request $request)
     {
         $labs = Lab::with(['user', 'wilaya', 'category'])
-            ->whereHas('user', function ($query) {
-                // Ensure the lab is active if needed
+            ->when($request->type, function ($query) use ($request) {
+                $query->whereHas('products', function ($q) use ($request) {
+                    $q->where('type', $request->type)->where('is_active', true);
+                });
             })
             ->get();
 
@@ -48,6 +50,9 @@ class LabController extends Controller
         
         $products = Product::where('user_id', $lab->user_id)
             ->where('is_active', true)
+            ->when($request->type, function ($query) use ($request) {
+                return $query->where('type', $request->type);
+            })
             ->with('media')
             ->latest()
             ->paginate(12);

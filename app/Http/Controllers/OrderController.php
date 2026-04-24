@@ -96,4 +96,34 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
+    public function show($id)
+    {
+        $order = Order::with(['items.product', 'lab.lab'])
+            ->where('student_id', Auth::id())
+            ->findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $order
+        ]);
+    }
+
+    public function signature(Request $request, $id)
+    {
+        $order = Order::where('student_id', Auth::id())
+            ->where('status', 'estimation_provided')
+            ->findOrFail($id);
+
+        $order->update([
+            'status' => 'confirmed',
+            'signed_at' => now(),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم توقيع العقد بنجاح',
+            'data' => $order
+        ]);
+    }
 }

@@ -1,24 +1,18 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
 Route::prefix('auth')->group(function() {
     Route::post('student/register', [\App\Http\Controllers\Api\Auth\StudentAuthenticationController::class, 'register']);
     Route::post('business/register', [\App\Http\Controllers\Api\Auth\LabAuthenticationController::class, 'register']);
-    Route::post('business/register', [\App\Http\Controllers\Api\Auth\LabAuthenticationController::class, 'register']);
 
-    Route::post('login', [\App\Http\Controllers\Api\AuthenticationController::class, 'login']);
+    Route::post('login', [\App\Http\Controllers\Api\Auth\AuthenticationController::class, 'login']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('student/push-token', [\App\Http\Controllers\Api\PushTokenController::class, 'store']);
         Route::post('business/push-token', [\App\Http\Controllers\Api\PushTokenController::class, 'store']);
-        Route::get('me', [\App\Http\Controllers\Api\AuthenticationController::class, 'me'])->middleware('auth:sanctum');
-        Route::post('logout', [\App\Http\Controllers\Api\AuthenticationController::class, 'logout'])->middleware('auth:sanctum');
+        Route::get('me', [\App\Http\Controllers\Api\Auth\AuthenticationController::class, 'me'])->middleware('auth:sanctum');
+        Route::post('logout', [\App\Http\Controllers\Api\Auth\AuthenticationController::class, 'logout'])->middleware('auth:sanctum');
     });
 });
 
@@ -33,6 +27,7 @@ Route::prefix('labs')->group(function() {
 Route::prefix('products')->group(function() {
     Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index'])->middleware('auth:sanctum');
     Route::post('/', [\App\Http\Controllers\Api\ProductController::class, 'store'])->middleware('auth:sanctum');
+    Route::put('/{id}', [\App\Http\Controllers\Api\ProductController::class, 'update'])->middleware('auth:sanctum');
     Route::get('/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
     Route::delete('/{id}', [\App\Http\Controllers\Api\ProductController::class, 'destroy'])->middleware('auth:sanctum');
 });
@@ -40,11 +35,15 @@ Route::prefix('products')->group(function() {
 Route::prefix('orders')->group(function() {
     Route::get('/', [\App\Http\Controllers\OrderController::class, 'index'])->middleware('auth:sanctum');
     Route::post('/', [\App\Http\Controllers\OrderController::class, 'store'])->middleware('auth:sanctum');
+    Route::get('/{id}', [\App\Http\Controllers\OrderController::class, 'show'])->middleware('auth:sanctum');
+    Route::post('/{id}/signature', [\App\Http\Controllers\OrderController::class, 'signature'])->middleware('auth:sanctum');
 });
 
 // Lab routes
 Route::prefix('lab')->middleware('auth:sanctum')->group(function () {
     Route::get('/products', [\App\Http\Controllers\Api\Lab\ProductController::class, 'index']);
+    // Lab Stats
+    Route::get('/stats', [\App\Http\Controllers\Api\Lab\StatsController::class, 'index']);
     // Lab Orders
     Route::get('/orders', [\App\Http\Controllers\LabOrderController::class, 'index']);
     Route::get('/orders/{id}', [\App\Http\Controllers\LabOrderController::class, 'show']);

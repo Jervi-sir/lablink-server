@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('path');
             $table->string('original_name');
             $table->string('mime_type');
+            $table->nullableMorphs('mediable');
             $table->timestamps();
         });
     }

@@ -19,12 +19,18 @@ return new class extends Migration
             $table->string('password');
             $table->string('password_plainText')->nullable();
 
-
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();
             $table->timestamp('two_factor_confirmed_at')->nullable();
 
             $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('push_tokens', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('token');
             $table->timestamps();
         });
 

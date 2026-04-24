@@ -19,9 +19,9 @@ class DatabaseSeeder extends Seeder
             LabCategorySeeder::class,
         ]);
 
-        User::factory()->create([
-            'phone_number' => '0558054300',
-            'email' => 'test@example.com',
-        ]);
+        // User::factory()->create([
+        //     'phone_number' => '0558054300',
+        //     'email' => 'test@example.com',
+        // ]);
     }
 }

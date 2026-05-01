@@ -148,4 +148,15 @@ class LabOrderController extends Controller
             'data' => $order->load('negotiations'),
         ]);
     }
+
+    public function markAsRead($id)
+    {
+        $order = Order::where('lab_id', Auth::id())->findOrFail($id);
+        $order->update(['lab_last_viewed_at' => now()]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم تحديد الطلب كمقروء'
+        ]);
+    }
 }

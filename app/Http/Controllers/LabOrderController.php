@@ -19,7 +19,7 @@ class LabOrderController extends Controller
             if ($request->tab === 'requests') {
                 $query->whereIn('status', ['request_estimation']);
             } elseif ($request->tab === 'confirmed') {
-                $query->whereIn('status', ['estimation_provided', 'confirmed', 'completed', 'rejected']);
+                $query->whereIn('status', ['estimation_provided', 'student_negotiation', 'lab_negotiation', 'confirmed', 'completed', 'rejected']);
             }
         }
 

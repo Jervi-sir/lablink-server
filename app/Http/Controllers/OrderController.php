@@ -20,7 +20,7 @@ class OrderController extends Controller
 
         if ($request->has('tab')) {
             if ($request->tab === 'requests') {
-                $query->whereIn('status', ['request_estimation', 'estimation_provided', 'rejected']);
+                $query->whereIn('status', ['request_estimation', 'estimation_provided', 'student_negotiation', 'lab_negotiation', 'rejected']);
             } elseif ($request->tab === 'confirmed') {
                 $query->whereIn('status', ['confirmed', 'completed']);
             }

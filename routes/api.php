@@ -49,6 +49,7 @@ Route::prefix('orders')->group(function () {
     Route::post('/', [OrderController::class, 'store'])->middleware('auth:sanctum');
     Route::get('/{id}', [OrderController::class, 'show'])->middleware('auth:sanctum');
     Route::post('/{id}/signature', [OrderController::class, 'signature'])->middleware('auth:sanctum');
+    Route::post('/{id}/negotiate', [OrderController::class, 'negotiate'])->middleware('auth:sanctum');
 });
 
 // Lab routes
@@ -60,6 +61,7 @@ Route::prefix('lab')->middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [LabOrderController::class, 'index']);
     Route::get('/orders/{id}', [LabOrderController::class, 'show']);
     Route::post('/orders/{id}/status', [LabOrderController::class, 'updateStatus']);
+    Route::post('/orders/{id}/negotiate', [LabOrderController::class, 'negotiate']);
 });
 
 Route::post('upload-temp', [UploadController::class, 'temp']);

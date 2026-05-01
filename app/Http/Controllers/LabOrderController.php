@@ -114,4 +114,38 @@ class LabOrderController extends Controller
             ], 500);
         }
     }
+
+    public function negotiate(Request $request, $id)
+    {
+        $request->validate([
+            'suggested_price' => 'required|numeric|min:0'
+        ]);
+
+        $order = Order::with('negotiations')->where('lab_id', Auth::id())
+            ->findOrFail($id);
+
+        if ($order->negotiations->count() >= 3 && $order->negotiations->last()->suggested_by === 'lab') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'لا يمكنك إضافة اقتراحات أخرى'
+            ], 403);
+        }
+
+        $order->negotiations()->create([
+            'suggested_by' => 'lab',
+            'suggested_price' => $request->suggested_price,
+            'status' => 'pending'
+        ]);
+
+        $order->update([
+            'status' => 'lab_negotiation',
+            'total_price' => $request->suggested_price
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم إرسال الاقتراح بنجاح',
+            'data' => $order->load('negotiations'),
+        ]);
+    }
 }

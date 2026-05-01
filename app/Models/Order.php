@@ -13,6 +13,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function negotiations()
+    {
+        return $this->hasMany(OrderNegotiation::class);
+    }
+
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');

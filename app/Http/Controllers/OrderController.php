@@ -112,6 +112,38 @@ class OrderController extends Controller
         ]);
     }
 
+    public function negotiate(Request $request, $id)
+    {
+        $request->validate([
+            'suggested_price' => 'required|numeric|min:0'
+        ]);
+
+        $order = Order::with('negotiations')->where('student_id', Auth::id())
+            ->findOrFail($id);
+
+        // Check if max 3 negotiations reached
+        if ($order->negotiations->count() >= 3) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'لقد وصلت إلى الحد الأقصى من الاقتراحات المسموح بها'
+            ], 403);
+        }
+
+        $order->negotiations()->create([
+            'suggested_by' => 'student',
+            'suggested_price' => $request->suggested_price,
+            'status' => 'pending'
+        ]);
+
+        $order->update(['status' => 'student_negotiation']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم إرسال اقتراح السعر بنجاح',
+            'data' => $order->load('negotiations'),
+        ]);
+    }
+
     public function signature(Request $request, $id)
     {
         $order = Order::where('student_id', Auth::id())

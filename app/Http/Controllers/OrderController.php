@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\Models\Lab;
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Support\Facades\DB;
+use App\Services\NotificationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -28,7 +30,7 @@ class OrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $orders
+            'data' => $orders,
         ]);
     }
 
@@ -39,13 +41,13 @@ class OrderController extends Controller
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $lab = \App\Models\Lab::findOrFail($request->lab_id);
+            $lab = Lab::find($request->lab_id);
 
             $order = Order::create([
                 'student_id' => Auth::id(),
@@ -67,32 +69,33 @@ class OrderController extends Controller
 
             // Send notification to Lab
             try {
-                $notificationService = app(\App\Services\NotificationService::class);
+                $notificationService = app(NotificationService::class);
                 $labUser = $order->lab;
                 if ($labUser) {
                     $studentName = Auth::user()->student->full_name ?? 'طالب جديد';
                     $notificationService->sendPushNotification(
                         $labUser,
-                        "طلب جديد! 🔬",
+                        'طلب جديد! 🔬',
                         "لقد تلقيت طلباً جديداً من {$studentName}.",
-                        ['order_id' => (string)$order->id, 'type' => 'new_order']
+                        ['order_id' => (string) $order->id, 'type' => 'new_order']
                     );
                 }
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error("Failed to send order creation notification: " . $e->getMessage());
+                Log::error('Failed to send order creation notification: '.$e->getMessage());
             }
 
             return response()->json([
                 'status' => 'success',
                 'data' => $order->load('items.product'),
-                'message' => 'تم إرسال طلب عرض السعر بنجاح'
+                'message' => 'تم إرسال طلب عرض السعر بنجاح',
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'حدث خطأ أثناء إرسال الطلب: ' . $e->getMessage()
+                'message' => 'حدث خطأ أثناء إرسال الطلب: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -105,7 +108,7 @@ class OrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $order
+            'data' => $order,
         ]);
     }
 
@@ -123,7 +126,7 @@ class OrderController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'تم توقيع العقد بنجاح',
-            'data' => $order
+            'data' => $order,
         ]);
     }
 }

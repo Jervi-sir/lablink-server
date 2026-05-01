@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lab;
-use App\Models\Product;
 use Illuminate\Http\Request;
 
 class LabController extends Controller
@@ -31,24 +30,20 @@ class LabController extends Controller
     /**
      * Display the specified lab.
      */
-    public function show($id)
+    public function show(Lab $lab)
     {
-        $lab = Lab::with(['user', 'wilaya', 'category'])->findOrFail($id);
-
         return response()->json([
             'status' => 'success',
-            'data' => $lab,
+            'data' => $lab->load(['user', 'wilaya', 'category']),
         ]);
     }
 
     /**
      * Get paginated products for a lab.
      */
-    public function products($id, Request $request)
+    public function products(Lab $lab, Request $request)
     {
-        $lab = Lab::findOrFail($id);
-        
-        $products = Product::where('user_id', $lab->user_id)
+        $products = $lab->products()
             ->where('is_active', true)
             ->when($request->type, function ($query) use ($request) {
                 return $query->where('type', $request->type);

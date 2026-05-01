@@ -16,6 +16,18 @@ class Lab extends Model
         'equipments_path_url',
     ];
 
+    /**
+     * Resolve the route binding for the model.
+     *
+     * Supports looking up by both internal 'id' or owner 'user_id'.
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where('id', $value)
+            ->orWhere('user_id', $value)
+            ->firstOrFail();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

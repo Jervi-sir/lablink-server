@@ -102,7 +102,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::with(['items.product', 'lab.lab'])
+        $order = Order::with(['items.product', 'lab.lab', 'negotiations'])
             ->where('student_id', Auth::id())
             ->findOrFail($id);
 
@@ -147,7 +147,7 @@ class OrderController extends Controller
     public function signature(Request $request, $id)
     {
         $order = Order::where('student_id', Auth::id())
-            ->where('status', 'estimation_provided')
+            ->whereIn('status', ['estimation_provided', 'lab_negotiation'])
             ->findOrFail($id);
 
         $order->update([

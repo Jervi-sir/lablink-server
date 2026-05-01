@@ -33,7 +33,7 @@ class LabOrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::with(['items.product', 'student.student'])
+        $order = Order::with(['items.product', 'student.student', 'negotiations'])
             ->where('lab_id', Auth::id())
             ->findOrFail($id);
 

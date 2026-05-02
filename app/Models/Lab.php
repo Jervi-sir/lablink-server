@@ -11,6 +11,7 @@ class Lab extends Model
         'wilaya_id',
         'lab_category_id',
         'brand_name',
+        'avatar_url',
         'nif',
         'permission_path_url',
         'equipments_path_url',

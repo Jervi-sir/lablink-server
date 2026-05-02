@@ -37,6 +37,7 @@ class ProfileController extends Controller
             'full_name' => ['required_if:student,!=,null', 'string'],
             'specialty' => ['nullable', 'string'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $user->update([
@@ -51,9 +52,16 @@ class ProfileController extends Controller
         }
 
         if ($user->lab) {
-            $user->lab->update([
+            $data = [
                 'brand_name' => $request->brand_name,
-            ]);
+            ];
+
+            if ($request->hasFile('avatar')) {
+                $path = $request->file('avatar')->store('avatars', 'public');
+                $data['avatar_url'] = $path;
+            }
+
+            $user->lab->update($data);
         }
 
         if ($user->student) {

@@ -43,6 +43,9 @@ class Lab extends Model
         return $this->belongsTo(LabCategory::class, 'lab_category_id');
     }
 
+    /**
+     * Get the products owned by the same user who owns this lab.
+     */
     public function products()
     {
         return $this->hasMany(Product::class, 'user_id', 'user_id');

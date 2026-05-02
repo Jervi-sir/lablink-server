@@ -30,20 +30,25 @@ class LabController extends Controller
     /**
      * Display the specified lab.
      */
-    public function show(Lab $lab)
+    public function show($lab)
     {
+        $lab_model = Lab::find($lab);
+        $lab_model->update([
+            'lab_last_viewed_at' => now(),
+        ]);
         return response()->json([
             'status' => 'success',
-            'data' => $lab->load(['user', 'wilaya', 'category']),
+            'data' => $lab_model->load(['user', 'wilaya', 'category']),
         ]);
     }
 
     /**
      * Get paginated products for a lab.
      */
-    public function products(Lab $lab, Request $request)
+    public function products($lab, Request $request)
     {
-        $products = $lab->products()
+        $lab_model = Lab::find($lab);
+        $products = $lab_model->products()
             ->where('is_active', true)
             ->when($request->type, function ($query) use ($request) {
                 return $query->where('type', $request->type);

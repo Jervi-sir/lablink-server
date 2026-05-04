@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Product;
+use App\Models\Lab;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
@@ -15,7 +16,9 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::where('user_id', Auth::id())
+        $lab = Lab::where('user_id', Auth::id())->firstOrFail();
+
+        $query = Product::where('lab_id', $lab->id)
             ->with('media', 'category')
             ->latest();
 

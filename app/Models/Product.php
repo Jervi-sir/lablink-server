@@ -10,7 +10,7 @@ class Product extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'user_id',
+        'lab_id',
         'product_category_id',
         'name_ar',
         'name_en',
@@ -55,21 +55,14 @@ class Product extends Model
         return null;
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function lab()
     {
-        return $this->hasOne(Lab::class, 'user_id', 'user_id');
+        return $this->belongsTo(Lab::class);
     }
 
     public function scopeForLab($query, $labId)
     {
-        return $query->whereIn('user_id', function ($q) use ($labId) {
-            $q->select('user_id')->from('labs')->where('id', $labId);
-        });
+        return $query->where('lab_id', $labId);
     }
 
     public function category()

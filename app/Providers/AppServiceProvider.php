@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         // if (app()->isProduction()) {
-            URL::forceScheme('https');
+        // URL::forceScheme('https');
         // }
 
         Password::defaults(fn (): ?Password => app()->isProduction()

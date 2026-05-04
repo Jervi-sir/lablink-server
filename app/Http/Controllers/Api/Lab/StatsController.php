@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Lab;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lab;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,7 @@ class StatsController extends Controller
     public function index()
     {
         $userId = Auth::id();
+        $lab = Lab::where('user_id', $userId)->firstOrFail();
 
         // Order statistics
         $totalOrders = Order::where('lab_id', $userId)->count();
@@ -40,11 +42,11 @@ class StatsController extends Controller
             ->sum('total_price');
 
         // Product/Service statistics
-        $totalProducts = Product::where('user_id', $userId)
+        $totalProducts = Product::where('lab_id', $lab->id)
             ->where('type', 'equipment')
             ->count();
 
-        $totalServices = Product::where('user_id', $userId)
+        $totalServices = Product::where('lab_id', $lab->id)
             ->where('type', 'service')
             ->count();
 

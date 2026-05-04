@@ -45,10 +45,10 @@ class Lab extends Model
     }
 
     /**
-     * Get the products owned by the same user who owns this lab.
+     * Get the products owned by this lab.
      */
     public function products()
     {
-        return $this->hasMany(Product::class, 'user_id', 'user_id');
+        return $this->hasMany(Product::class);
     }
 }

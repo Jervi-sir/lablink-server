@@ -45,7 +45,7 @@ class User extends Authenticatable
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasManyThrough(Product::class, Lab::class, 'user_id', 'lab_id');
     }
 
     public function pushTokens()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lab;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::where('user_id', Auth::id())
+        $lab = Lab::where('user_id', Auth::id())->firstOrFail();
+
+        $products = Product::where('lab_id', $lab->id)
             ->with('media')
             ->latest()
             ->get();
@@ -30,6 +33,8 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $lab = Lab::where('user_id', Auth::id())->firstOrFail();
+
         $validated = $request->validate([
             'name_ar' => 'required|string|max:255',
             'description_ar' => 'required|string',
@@ -56,7 +61,7 @@ class ProductController extends Controller
         $product = Product::create([
             ...collect($validated)->except(['media_ids', 'images'])->toArray(),
             'images' => $request->images,
-            'user_id' => Auth::id(),
+            'lab_id' => $lab->id,
             'price' => $request->price ?? 0,
         ]);
 
@@ -79,7 +84,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with(['media', 'category', 'user.lab'])->findOrFail($id);
+        $product = Product::with(['media', 'category', 'lab.user'])->findOrFail($id);
 
         return response()->json([
             'status' => 'success',
@@ -92,7 +97,8 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $product = Product::where('user_id', Auth::id())->findOrFail($id);
+        $lab = Lab::where('user_id', Auth::id())->firstOrFail();
+        $product = Product::where('lab_id', $lab->id)->findOrFail($id);
 
         $validated = $request->validate([
             'name_ar' => 'required|string|max:255',
@@ -142,7 +148,8 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::where('user_id', Auth::id())->findOrFail($id);
+        $lab = Lab::where('user_id', Auth::id())->firstOrFail();
+        $product = Product::where('lab_id', $lab->id)->findOrFail($id);
         $product->delete();
 
         return response()->json([

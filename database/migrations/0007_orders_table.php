@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('status')->default('request_estimation'); // request_estimation, estimation_provided, confirmed, rejected, completed
             $table->decimal('total_price', 10, 2)->nullable();
             $table->text('notes')->nullable();
+
+            $table->timestamp('student_last_viewed_at')->nullable();
+            $table->timestamp('lab_last_viewed_at')->nullable();
+
             $table->timestamps();
         });
 
@@ -28,6 +32,16 @@ return new class extends Migration
             $table->integer('quantity')->default(1);
             $table->decimal('price', 10, 2)->nullable();
             $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+
+
+        Schema::create('order_negotiations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->string('suggested_by'); // 'student' or 'lab'
+            $table->decimal('suggested_price', 10, 2);
+            $table->string('status')->default('pending'); // pending, accepted, rejected
             $table->timestamps();
         });
 

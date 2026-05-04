@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreignId('lab_category_id')->constrained()->nullOnDelete();
 
             $table->string('brand_name');
+            $table->string('avatar_url')->nullable();
             $table->string('nif')->nullable();
             $table->string('permission_path_url')->nullable();
             $table->string('equipments_path_url')->nullable();

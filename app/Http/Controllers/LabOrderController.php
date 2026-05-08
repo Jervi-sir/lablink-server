@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class LabOrderController extends Controller
 {
@@ -46,7 +47,7 @@ class LabOrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:estimation_provided,confirmed,rejected,completed',
+            'status' => 'required|in:estimation_provided,rejected,completed',
             'total_price' => 'nullable|numeric',
             'items' => 'nullable|array',
             'items.*.id' => 'required|exists:order_items,id',
@@ -118,18 +119,67 @@ class LabOrderController extends Controller
     public function negotiate(Request $request, $id)
     {
         $request->validate([
-            'suggested_price' => 'required|numeric|min:0'
+            'action' => ['nullable', Rule::in(['accept', 'counter', 'reject'])],
+            'suggested_price' => 'nullable|numeric|min:0',
         ]);
 
         $order = Order::with('negotiations')->where('lab_id', Auth::id())
             ->findOrFail($id);
 
-        if ($order->negotiations->count() >= 3 && $order->negotiations->last()->suggested_by === 'lab') {
+        if ($order->status !== 'student_negotiation') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'لا يمكن الرد على هذا التفاوض حالياً',
+            ], 422);
+        }
+
+        $latestNegotiation = $order->negotiations->sortByDesc('created_at')->first();
+        if (!$latestNegotiation || $latestNegotiation->suggested_by !== 'student' || $latestNegotiation->status !== 'pending') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'لا يوجد اقتراح طالب بانتظار رد المخبر',
+            ], 422);
+        }
+
+        $action = $request->input('action', 'counter');
+
+        if ($action === 'reject') {
+            $latestNegotiation->update(['status' => 'rejected']);
+            $order->update(['status' => 'rejected']);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم رفض اقتراح الطالب',
+                'data' => $order->fresh(['items.product', 'student.student', 'negotiations']),
+            ]);
+        }
+
+        if ($action === 'accept') {
+            $latestNegotiation->update(['status' => 'accepted']);
+            $order->update([
+                'status' => 'lab_negotiation',
+                'total_price' => $latestNegotiation->suggested_price,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم قبول سعر الطالب وبانتظار تأكيده النهائي',
+                'data' => $order->fresh(['items.product', 'student.student', 'negotiations']),
+            ]);
+        }
+
+        $request->validate([
+            'suggested_price' => 'required|numeric|min:0',
+        ]);
+
+        if ($order->negotiations->where('suggested_by', 'lab')->count() >= 3) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'لا يمكنك إضافة اقتراحات أخرى'
             ], 403);
         }
+
+        $latestNegotiation->update(['status' => 'rejected']);
 
         $order->negotiations()->create([
             'suggested_by' => 'lab',

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -115,18 +116,52 @@ class OrderController extends Controller
     public function negotiate(Request $request, $id)
     {
         $request->validate([
-            'suggested_price' => 'required|numeric|min:0'
+            'action' => ['nullable', Rule::in(['counter', 'reject'])],
+            'suggested_price' => 'nullable|numeric|min:0',
         ]);
 
         $order = Order::with('negotiations')->where('student_id', Auth::id())
             ->findOrFail($id);
 
+        if (!in_array($order->status, ['estimation_provided', 'lab_negotiation'], true)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'لا يمكن التفاوض على هذا الطلب حالياً',
+            ], 422);
+        }
+
+        $action = $request->input('action', 'counter');
+
+        if ($action === 'reject') {
+            $latestNegotiation = $order->negotiations->sortByDesc('created_at')->first();
+            if ($latestNegotiation && $latestNegotiation->suggested_by === 'lab' && $latestNegotiation->status === 'pending') {
+                $latestNegotiation->update(['status' => 'rejected']);
+            }
+
+            $order->update(['status' => 'rejected']);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم رفض التسعير',
+                'data' => $order->fresh(['items.product', 'lab.lab', 'negotiations']),
+            ]);
+        }
+
+        $request->validate([
+            'suggested_price' => 'required|numeric|min:0',
+        ]);
+
         // Check if max 3 negotiations reached
-        if ($order->negotiations->count() >= 3) {
+        if ($order->negotiations->where('suggested_by', 'student')->count() >= 3) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'لقد وصلت إلى الحد الأقصى من الاقتراحات المسموح بها'
             ], 403);
+        }
+
+        $latestNegotiation = $order->negotiations->sortByDesc('created_at')->first();
+        if ($latestNegotiation && $latestNegotiation->suggested_by === 'lab' && $latestNegotiation->status === 'pending') {
+            $latestNegotiation->update(['status' => 'rejected']);
         }
 
         $order->negotiations()->create([
@@ -150,9 +185,13 @@ class OrderController extends Controller
             ->whereIn('status', ['estimation_provided', 'lab_negotiation'])
             ->findOrFail($id);
 
+        $latestNegotiation = $order->negotiations()->latest()->first();
+        if ($latestNegotiation && $latestNegotiation->suggested_by === 'lab' && $latestNegotiation->status === 'pending') {
+            $latestNegotiation->update(['status' => 'accepted']);
+        }
+
         $order->update([
             'status' => 'confirmed',
-            'signed_at' => now(),
         ]);
 
         return response()->json([

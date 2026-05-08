@@ -51,6 +51,7 @@ Route::prefix('orders')->group(function () {
     Route::post('/{id}/signature', [OrderController::class, 'signature'])->middleware('auth:sanctum');
     Route::post('/{id}/negotiate', [OrderController::class, 'negotiate'])->middleware('auth:sanctum');
     Route::post('/{id}/read', [OrderController::class, 'markAsRead'])->middleware('auth:sanctum');
+    Route::delete('/{id}', [OrderController::class, 'destroy'])->middleware('auth:sanctum');
 });
 
 // Lab routes

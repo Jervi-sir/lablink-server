@@ -211,4 +211,23 @@ class OrderController extends Controller
             'message' => 'تم تحديد الطلب كمقروء'
         ]);
     }
+
+    public function destroy($id)
+    {
+        $order = Order::where('student_id', Auth::id())->findOrFail($id);
+
+        if ($order->status !== 'rejected') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'يمكن حذف الطلبات المرفوضة فقط',
+            ], 422);
+        }
+
+        $order->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم حذف الطلب بنجاح',
+        ]);
+    }
 }

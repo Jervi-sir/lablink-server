@@ -21,6 +21,7 @@ return new class extends Migration
 
             $table->timestamp('student_last_viewed_at')->nullable();
             $table->timestamp('lab_last_viewed_at')->nullable();
+            $table->string('contract_pdf_url')->nullable();
 
             $table->timestamps();
         });
@@ -34,7 +35,6 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
         });
-
 
         Schema::create('order_negotiations', function (Blueprint $table) {
             $table->id();

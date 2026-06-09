@@ -29,7 +29,7 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-        
+
         $request->validate([
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'phone_number' => ['required', 'string', Rule::unique('users')->ignore($user->id)],

@@ -20,11 +20,11 @@ class StatsController extends Controller
 
         // Order statistics
         $totalOrders = Order::where('lab_id', $userId)->count();
-        
+
         $pendingOrders = Order::where('lab_id', $userId)
             ->whereIn('status', ['request_estimation'])
             ->count();
-            
+
         $activeOrders = Order::where('lab_id', $userId)
             ->whereIn('status', ['estimation_provided', 'confirmed'])
             ->count();
@@ -67,8 +67,8 @@ class StatsController extends Controller
                     'products' => $totalProducts,
                     'services' => $totalServices,
                     'total' => $totalProducts + $totalServices,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

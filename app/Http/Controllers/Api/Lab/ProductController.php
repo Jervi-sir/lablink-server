@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Api\Lab;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\Product;
 use App\Models\Lab;
+use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller

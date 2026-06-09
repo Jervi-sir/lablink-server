@@ -16,7 +16,7 @@ class UploadController extends Controller
         ]);
 
         $file = $request->file('file');
-        
+
         // Store in storage/app/public/temp
         $path = $file->store('temp', 'public');
 
@@ -31,7 +31,7 @@ class UploadController extends Controller
             'data' => [
                 'id' => $media->id,
                 'path' => $path,
-                'url' => asset('storage/' . $path),
+                'url' => asset('storage/'.$path),
             ],
         ]);
     }

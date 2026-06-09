@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthenticationController extends Controller
 {
@@ -19,7 +18,7 @@ class AuthenticationController extends Controller
 
         $user = User::where('phone_number', $request->phone_number)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'بيانات الاعتماد غير صحيحة',

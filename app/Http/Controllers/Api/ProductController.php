@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lab;
+use App\Models\Media;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,14 +42,14 @@ class ProductController extends Controller
             'type' => 'required|string',
             'image_url' => 'nullable|string',
             'specifications' => 'nullable|array',
-            
+
             // Equipment specific
             'location' => 'nullable|string',
             'supervisor' => 'nullable|string',
             'working_hours' => 'nullable|string',
             'min_booking_time' => 'nullable|string',
             'is_available' => 'nullable|boolean',
-            
+
             // Product specific
             'price' => 'nullable|numeric',
             'stock_quantity' => 'nullable|integer',
@@ -65,8 +66,8 @@ class ProductController extends Controller
             'price' => $request->price ?? 0,
         ]);
 
-        if (!empty($validated['media_ids'])) {
-            \App\Models\Media::whereIn('id', $validated['media_ids'])->update([
+        if (! empty($validated['media_ids'])) {
+            Media::whereIn('id', $validated['media_ids'])->update([
                 'mediable_id' => $product->id,
                 'mediable_type' => Product::class,
             ]);
@@ -106,14 +107,14 @@ class ProductController extends Controller
             'type' => 'required|string',
             'image_url' => 'nullable|string',
             'specifications' => 'nullable|array',
-            
+
             // Equipment specific
             'location' => 'nullable|string',
             'supervisor' => 'nullable|string',
             'working_hours' => 'nullable|string',
             'min_booking_time' => 'nullable|string',
             'is_available' => 'nullable|boolean',
-            
+
             // Product specific
             'price' => 'nullable|numeric',
             'stock_quantity' => 'nullable|integer',
@@ -129,8 +130,8 @@ class ProductController extends Controller
             'price' => $request->price ?? $product->price,
         ]);
 
-        if (!empty($validated['media_ids'])) {
-            \App\Models\Media::whereIn('id', $validated['media_ids'])->update([
+        if (! empty($validated['media_ids'])) {
+            Media::whereIn('id', $validated['media_ids'])->update([
                 'mediable_id' => $product->id,
                 'mediable_type' => Product::class,
             ]);

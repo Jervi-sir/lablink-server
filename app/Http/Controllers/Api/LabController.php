@@ -36,6 +36,7 @@ class LabController extends Controller
         $lab_model->update([
             'lab_last_viewed_at' => now(),
         ]);
+
         return response()->json([
             'status' => 'success',
             'data' => $lab_model->load(['user', 'wilaya', 'category']),

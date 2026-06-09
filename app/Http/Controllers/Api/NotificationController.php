@@ -16,9 +16,9 @@ class NotificationController extends Controller
     public function sendToUser(Request $request)
     {
         $user = User::findOrFail(8);
-        
+
         $notificationService = app(NotificationService::class);
-        
+
         $notificationService->sendPushNotification(
             $user,
             'Manual Test Notification',
@@ -28,7 +28,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Notification sent request processed successfully'
+            'message' => 'Notification sent request processed successfully',
         ]);
     }
 }

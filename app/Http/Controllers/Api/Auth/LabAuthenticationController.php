@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lab;
-use App\Models\LabCategory;
 use App\Models\User;
-use App\Models\Wilaya;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class LabAuthenticationController extends Controller
 {
@@ -35,7 +32,6 @@ class LabAuthenticationController extends Controller
                 'password' => Hash::make($request->password),
                 'password_plainText' => $request->password,
             ]);
-
 
             $lab = Lab::create([
                 'user_id' => $user->id,

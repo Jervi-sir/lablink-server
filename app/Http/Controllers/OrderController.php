@@ -6,10 +6,12 @@ use App\Models\Lab;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\NotificationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
@@ -123,7 +125,7 @@ class OrderController extends Controller
         $order = Order::with('negotiations')->where('student_id', Auth::id())
             ->findOrFail($id);
 
-        if (!in_array($order->status, ['estimation_provided', 'lab_negotiation'], true)) {
+        if (! in_array($order->status, ['estimation_provided', 'lab_negotiation'], true)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'لا يمكن التفاوض على هذا الطلب حالياً',
@@ -155,7 +157,7 @@ class OrderController extends Controller
         if ($order->negotiations->where('suggested_by', 'student')->count() >= 3) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'لقد وصلت إلى الحد الأقصى من الاقتراحات المسموح بها'
+                'message' => 'لقد وصلت إلى الحد الأقصى من الاقتراحات المسموح بها',
             ], 403);
         }
 
@@ -167,7 +169,7 @@ class OrderController extends Controller
         $order->negotiations()->create([
             'suggested_by' => 'student',
             'suggested_price' => $request->suggested_price,
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         $order->update(['status' => 'student_negotiation']);
@@ -181,17 +183,54 @@ class OrderController extends Controller
 
     public function signature(Request $request, $id)
     {
-        $order = Order::where('student_id', Auth::id())
+        $order = Order::with(['student.student', 'lab.lab', 'items.product'])
+            ->where('student_id', Auth::id())
             ->whereIn('status', ['estimation_provided', 'lab_negotiation'])
             ->findOrFail($id);
+
+        $request->validate([
+            'signature_paths' => 'required|array',
+        ]);
 
         $latestNegotiation = $order->negotiations()->latest()->first();
         if ($latestNegotiation && $latestNegotiation->suggested_by === 'lab' && $latestNegotiation->status === 'pending') {
             $latestNegotiation->update(['status' => 'accepted']);
         }
 
+        // Get details for the PDF
+        $studentName = $order->student->student->full_name ?? 'طالب';
+        $studentPhone = $order->student->phone_number ?? '';
+        $labName = $order->lab->lab->brand_name ?? 'مخبر';
+        $labNumber = $order->lab->phone_number ?? '';
+        $orderItems = $order->items;
+
+        try {
+            // Generate PDF using dompdf
+            $pdf = Pdf::loadView('pdf.lab-student-contract-template', [
+                'labName' => $labName,
+                'labNumber' => $labNumber,
+                'studentName' => $studentName,
+                'studentPhone' => $studentPhone,
+                'orderItems' => $orderItems,
+                'totalPrice' => $order->total_price,
+                'signaturePaths' => $request->input('signature_paths', []),
+            ])->setOption('isRemoteEnabled', true);
+
+            $pdfContent = $pdf->output();
+
+            // Save PDF to public storage
+            $fileName = "contracts/contract_{$order->id}.pdf";
+            Storage::disk('public')->put($fileName, $pdfContent);
+
+            $contractUrl = asset('storage/'.$fileName);
+        } catch (\Exception $e) {
+            Log::error('PDF generation failed: '.$e->getMessage());
+            $contractUrl = null;
+        }
+
         $order->update([
             'status' => 'confirmed',
+            'contract_pdf_url' => $contractUrl,
         ]);
 
         return response()->json([
@@ -208,7 +247,7 @@ class OrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'تم تحديد الطلب كمقروء'
+            'message' => 'تم تحديد الطلب كمقروء',
         ]);
     }
 

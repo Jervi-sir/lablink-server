@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Wilaya;
-use App\Models\ProductCategory;
 use App\Models\LabCategory;
+use App\Models\ProductCategory;
+use App\Models\Wilaya;
+use Illuminate\Http\Request;
 
 class TaxonomyController extends Controller
 {

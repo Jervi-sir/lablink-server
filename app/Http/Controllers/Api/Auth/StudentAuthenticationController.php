@@ -5,11 +5,9 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
-use App\Models\Wilaya;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class StudentAuthenticationController extends Controller
 {
@@ -31,7 +29,6 @@ class StudentAuthenticationController extends Controller
                 'password' => Hash::make($request->password),
                 'password_plainText' => $request->password,
             ]);
-
 
             $student = Student::create([
                 'user_id' => $user->id,

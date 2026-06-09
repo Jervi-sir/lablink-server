@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\NotificationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class LabOrderController extends Controller
@@ -28,7 +30,7 @@ class LabOrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $orders
+            'data' => $orders,
         ]);
     }
 
@@ -40,7 +42,7 @@ class LabOrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $order
+            'data' => $order,
         ]);
     }
 
@@ -51,19 +53,19 @@ class LabOrderController extends Controller
             'total_price' => 'nullable|numeric',
             'items' => 'nullable|array',
             'items.*.id' => 'required|exists:order_items,id',
-            'items.*.price' => 'required|numeric'
+            'items.*.price' => 'required|numeric',
         ]);
 
         try {
             DB::beginTransaction();
 
             $order = Order::where('lab_id', Auth::id())->findOrFail($id);
-            
+
             $updateData = ['status' => $request->status];
             if ($request->has('total_price')) {
                 $updateData['total_price'] = $request->total_price;
             }
-            
+
             $order->update($updateData);
 
             if ($request->has('items')) {
@@ -77,8 +79,8 @@ class LabOrderController extends Controller
 
             // Send notification to Student
             try {
-                $notificationService = app(\App\Services\NotificationService::class);
-                
+                $notificationService = app(NotificationService::class);
+
                 $statusAr = [
                     'estimation_provided' => 'تم تقديم عرض سعر',
                     'confirmed' => 'تم تأكيد طلبك',
@@ -92,26 +94,27 @@ class LabOrderController extends Controller
                 if ($studentUser) {
                     $notificationService->sendPushNotification(
                         $studentUser,
-                        "تحديث في حالة الطلب 📦",
+                        'تحديث في حالة الطلب 📦',
                         $body,
-                        ['order_id' => (string)$order->id, 'type' => 'order_status_change', 'status' => $request->status]
+                        ['order_id' => (string) $order->id, 'type' => 'order_status_change', 'status' => $request->status]
                     );
                 }
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error("Failed to send order status update notification: " . $e->getMessage());
+                Log::error('Failed to send order status update notification: '.$e->getMessage());
             }
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'تم تحديث حالة الطلب بنجاح',
-                'data' => $order->load('items.product')
+                'data' => $order->load('items.product'),
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'حدث خطأ أثناء تحديث الطلب: ' . $e->getMessage()
+                'message' => 'حدث خطأ أثناء تحديث الطلب: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -134,7 +137,7 @@ class LabOrderController extends Controller
         }
 
         $latestNegotiation = $order->negotiations->sortByDesc('created_at')->first();
-        if (!$latestNegotiation || $latestNegotiation->suggested_by !== 'student' || $latestNegotiation->status !== 'pending') {
+        if (! $latestNegotiation || $latestNegotiation->suggested_by !== 'student' || $latestNegotiation->status !== 'pending') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'لا يوجد اقتراح طالب بانتظار رد المخبر',
@@ -175,7 +178,7 @@ class LabOrderController extends Controller
         if ($order->negotiations->where('suggested_by', 'lab')->count() >= 3) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'لا يمكنك إضافة اقتراحات أخرى'
+                'message' => 'لا يمكنك إضافة اقتراحات أخرى',
             ], 403);
         }
 
@@ -184,12 +187,12 @@ class LabOrderController extends Controller
         $order->negotiations()->create([
             'suggested_by' => 'lab',
             'suggested_price' => $request->suggested_price,
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         $order->update([
             'status' => 'lab_negotiation',
-            'total_price' => $request->suggested_price
+            'total_price' => $request->suggested_price,
         ]);
 
         return response()->json([
@@ -206,7 +209,7 @@ class LabOrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'تم تحديد الطلب كمقروء'
+            'message' => 'تم تحديد الطلب كمقروء',
         ]);
     }
 }

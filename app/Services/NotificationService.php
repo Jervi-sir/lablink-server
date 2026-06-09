@@ -17,14 +17,16 @@ class NotificationService
 
         if (empty($tokens)) {
             Log::info("No push tokens found for user ID: {$user->id}");
+
             return;
         }
 
         $messages = [];
         foreach ($tokens as $token) {
             // Simple check to ensure we are sending to an Expo token
-            if (!str_contains($token, 'ExponentPushToken') && !str_contains($token, 'ExpoPushToken')) {
+            if (! str_contains($token, 'ExponentPushToken') && ! str_contains($token, 'ExpoPushToken')) {
                 Log::warning("Skipping invalid token format: $token");
+
                 continue;
             }
 
@@ -34,7 +36,7 @@ class NotificationService
                 'body' => $body,
             ];
 
-            if (!empty($data)) {
+            if (! empty($data)) {
                 $msg['data'] = $data;
             }
 
@@ -43,6 +45,7 @@ class NotificationService
 
         if (empty($messages)) {
             Log::info("No valid tokens after filtering for user ID: {$user->id}");
+
             return;
         }
 
@@ -54,14 +57,15 @@ class NotificationService
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
             ])->post('https://exp.host/--/api/v2/push/send', $payload);
-            
-            if (!$response->successful()) {
-                Log::error("Failed to send push notifications to user ID: {$user->id}. Response: " . $response->body());
+
+            if (! $response->successful()) {
+                Log::error("Failed to send push notifications to user ID: {$user->id}. Response: ".$response->body());
             }
-            
+
             return $response->json();
         } catch (\Exception $e) {
-            Log::error("Error sending push notification: " . $e->getMessage());
+            Log::error('Error sending push notification: '.$e->getMessage());
+
             return ['error' => $e->getMessage()];
         }
     }

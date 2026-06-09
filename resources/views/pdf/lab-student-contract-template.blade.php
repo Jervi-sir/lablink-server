@@ -7,23 +7,23 @@
 
   <style>
     body {
-      margin: 0;
-      background: #f3f3f3;
-      font-family: "Amiri", "Times New Roman", serif;
-      color: #000;
+        direction: rtl;
+        text-align: right;
+        font-family: Arial, Tahoma, sans-serif;
     }
 
     .pdf-page {
-      width: 794px;
-      min-height: 1123px;
-      margin: 30px auto;
-      background: white;
-      padding: 85px 75px;
-      box-sizing: border-box;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
-      direction: rtl;
-      line-height: 2.1;
-      font-size: 16px;
+        width: 794px;
+        min-height: 1123px;
+        margin: 30px auto;
+        background: white;
+        padding: 85px 75px;
+        box-sizing: border-box;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+        direction: rtl;
+        unicode-bidi: embed;
+        line-height: 2.1;
+        font-size: 16px;
     }
 
     h1 {

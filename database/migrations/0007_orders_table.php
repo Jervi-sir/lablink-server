@@ -21,7 +21,6 @@ return new class extends Migration
 
             $table->timestamp('student_last_viewed_at')->nullable();
             $table->timestamp('lab_last_viewed_at')->nullable();
-            $table->string('contract_pdf_url')->nullable();
 
             $table->timestamps();
         });

@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\TaxonomyController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\LabOrderController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderSignatureController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -48,7 +49,7 @@ Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index'])->middleware('auth:sanctum');
     Route::post('/', [OrderController::class, 'store'])->middleware('auth:sanctum');
     Route::get('/{id}', [OrderController::class, 'show'])->middleware('auth:sanctum');
-    Route::post('/{id}/signature', [OrderController::class, 'signature'])->middleware('auth:sanctum');
+    Route::post('/{id}/signature', [OrderSignatureController::class, 'signature'])->middleware('auth:sanctum');
     Route::post('/{id}/negotiate', [OrderController::class, 'negotiate'])->middleware('auth:sanctum');
     Route::post('/{id}/read', [OrderController::class, 'markAsRead'])->middleware('auth:sanctum');
     Route::delete('/{id}', [OrderController::class, 'destroy'])->middleware('auth:sanctum');

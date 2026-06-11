@@ -94,27 +94,26 @@ class LabOrderController extends Controller
                 if ($studentUser) {
                     $notificationService->sendPushNotification(
                         $studentUser,
-                        'تحديث في حالة الطلب 📦',
+                        'تحديث في حالة الحجز 📦',
                         $body,
                         ['order_id' => (string) $order->id, 'type' => 'order_status_change', 'status' => $request->status]
                     );
                 }
             } catch (\Exception $e) {
-                Log::error('Failed to send order status update notification: '.$e->getMessage());
+                Log::error('Failed to send order status update notification: ' . $e->getMessage());
             }
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'تم تحديث حالة الطلب بنجاح',
+                'message' => 'تم تحديث حالة الحجز بنجاح',
                 'data' => $order->load('items.product'),
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'حدث خطأ أثناء تحديث الطلب: '.$e->getMessage(),
+                'message' => 'حدث خطأ أثناء تحديث الحجز: ' . $e->getMessage(),
             ], 500);
         }
     }
